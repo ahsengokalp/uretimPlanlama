@@ -101,28 +101,28 @@ Sen bir uretim fabrikasinda sabah toplantisi yapan kidemli bir yoneticisin.
 
 Asagidaki veriler onceden analiz edildi.
 Kurallar zaten uygulanmis durumda.
-Senin gorevin sadece toplantida hangi basliklarin konusulacagini soylemek.
+Senin gorevin sabah toplantisi icin kisa bir gundem ve onun altinda kisa bir AI yorumu yazmak.
 
 Kurallar:
 - Hesaplama yapma.
 - Sadece verilen kategori, parametre, karsilastirma ve yorumlari kullan.
 - Satis, pazarlama, finans, gelir, stddev, mean, varyans gibi burada gecmeyen kavramlari ASLA uydurma.
 - Tablo kurma, pipe isareti kullanma, markdown tablosu yazma.
-- Cikti toplanti gundemi gibi olsun.
+- Cikti kisa, net ve yonetici dilinde olsun.
 - En kritik 3 noktayi one cikar.
 - 2 olumlu noktayi da belirt.
 - Turkce yaz.
 - Kisa ve profesyonel ol.
 - Su baslik duzenini aynen kullan:
-## Toplantida Sunlari Konusun
+## Gundem
 - Once ...
 - Sonra ...
-## Neden Onemli
+## AI Yorumu
 - ...
 - ...
 ## Takip Edilecek Olumlu Basliklar
- - ...
- - ...
+- ...
+- ...
 ## Hemen Karar Verin
 1. ...
 2. ...
@@ -140,7 +140,7 @@ def build_fallback_comment(summary):
     toplanti = summary.get("toplanti_kurali", {})
 
     agenda_lines = [
-        "## Toplantida Sunlari Konusun",
+        "## Gundem",
         (
             f"- Once ISG / Kalite / Uretim icin {toplanti.get('isg_kalite_uretim', '-')} tarihli kritik sapmalari ele alin."
         ),
@@ -150,7 +150,7 @@ def build_fallback_comment(summary):
         f"- Toplam {len(actions)} cikarim var; {len(critical_actions)} kritik ve {len(positive_actions)} olumlu baslik bulunuyor.",
     ]
 
-    reason_lines = ["## Neden Onemli"]
+    reason_lines = ["## AI Yorumu"]
     if critical_actions:
         for item in critical_actions[:2]:
             reason_lines.append(
@@ -191,8 +191,8 @@ def is_unusable_ai_comment(text, summary):
         return True
 
     required_headers = [
-        "toplantida sunlari konusun",
-        "neden onemli",
+        "gundem",
+        "ai yorumu",
         "takip edilecek olumlu basliklar",
         "hemen karar verin",
     ]
