@@ -1,114 +1,38 @@
 {% extends "base.html" %}
 
 {% block title %}Uretim Toplanti Asistani{% endblock %}
-{% block topbar_title %}Toplanti Paneli{% endblock %}
-
-{% block top_actions %}
-    <a class="nav-chip nav-chip--solid" href="/">Yukleme</a>
-{% endblock %}
+{% block topbar_title %}Sabah Analizi{% endblock %}
+{% block top_actions %}{% endblock %}
 
 {% block content %}
-    <section class="metric-grid">
-        <article class="metric-card metric-card--span-3">
-            <div class="metric-icon metric-icon--info">XL</div>
-            <div class="metric-copy">
-                <span class="metric-label">Dosya</span>
-                <strong class="metric-value metric-value--lg">Excel</strong>
-                <span class="metric-help">.xlsx veya .xls</span>
+    <section class="landing-shell">
+        <article class="landing-card">
+            <div class="landing-copy">
+                <span class="landing-kicker">Excel Yukleme</span>
+                <h1 class="landing-title">Sabah toplanti analizi</h1>
+                <p class="landing-text">Tek bir Excel dosyasi yukleyin. Sistem toplanti icin ozet, cikarim ve grafikleri hazirlasin.</p>
+                <div class="landing-tags">
+                    <span class="landing-tag">Veriler sayfasi</span>
+                    <span class="landing-tag">Kategori + Parametre</span>
+                    <span class="landing-tag">Tarih kolonlari</span>
+                    <span class="landing-tag">.xlsx / .xls</span>
+                </div>
             </div>
-        </article>
-        <article class="metric-card metric-card--span-3">
-            <div class="metric-icon metric-icon--success">VR</div>
-            <div class="metric-copy">
-                <span class="metric-label">Sayfa</span>
-                <strong class="metric-value metric-value--lg">Veriler</strong>
-                <span class="metric-help">Kategori + Parametre</span>
-            </div>
-        </article>
-        <article class="metric-card metric-card--span-3">
-            <div class="metric-icon metric-icon--warning">AI</div>
-            <div class="metric-copy">
-                <span class="metric-label">AI</span>
-                <strong class="metric-value metric-value--lg">Opsiyonel</strong>
-                <span class="metric-help">Ozet</span>
-            </div>
-        </article>
-        <article class="metric-card metric-card--span-3">
-            <div class="metric-icon metric-icon--danger">AK</div>
-            <div class="metric-copy">
-                <span class="metric-label">Cikti</span>
-                <strong class="metric-value metric-value--lg">Aksiyonlar</strong>
-                <span class="metric-help">Inceleme + grafik</span>
-            </div>
-        </article>
-    </section>
 
-    <section class="upload-grid">
-        <aside class="card-shell">
-            <div class="card-head">
-                <div>
-                    <h2>Hazirlik Notlari</h2>
+            <form class="upload-form upload-form--landing" action="/analyze" method="post" enctype="multipart/form-data" id="upload-form">
+                <input class="file-input" id="file" type="file" name="file" accept=".xlsx,.xls" required>
+                <label class="file-drop file-drop--landing" for="file">
+                    <span class="file-drop-badge">XL</span>
+                    <span class="file-drop-title">Excel dosyasini sec</span>
+                    <span class="file-name" id="file-name">Henuz dosya secilmedi.</span>
+                    <span class="helper-text">Desteklenen bicimler: .xlsx ve .xls</span>
+                </label>
+                <div class="landing-actions">
+                    <button class="button-primary button-primary--wide" id="submit-button" type="submit">Analizi baslat</button>
+                    <p class="landing-note">Ilk iki sutun `Kategori` ve `Parametre` olmali.</p>
                 </div>
-            </div>
-            <div class="list-stack">
-                <div class="list-item">
-                    <div>
-                        <div class="list-title">Veriler sayfasi</div>
-                        <div class="list-meta">Zorunlu</div>
-                    </div>
-                    <span class="list-action">1</span>
-                </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-title">Kategori / Parametre</div>
-                        <div class="list-meta">Ilk iki sutun</div>
-                    </div>
-                    <span class="list-action">2</span>
-                </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-title">Tarih kolonlari</div>
-                        <div class="list-meta">3. sutundan sonra</div>
-                    </div>
-                    <span class="list-action">3</span>
-                </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-title">Hedef satirlari</div>
-                        <div class="list-meta">Varsa okunur</div>
-                    </div>
-                    <span class="list-action">4</span>
-                </div>
-            </div>
-        </aside>
-
-        <section class="stack">
-            <article class="card-shell">
-                <div class="card-head">
-                    <div>
-                        <h2>Dosya Yukle</h2>
-                    </div>
-                </div>
-                <div class="card-body upload-box">
-                    <div>
-                        <h1 class="page-title">Sabah toplanti analizi</h1>
-                        <p class="page-subtitle">Excel dosyanizi secip analizi baslatin.</p>
-                    </div>
-
-                    <form class="upload-form" action="/analyze" method="post" enctype="multipart/form-data" id="upload-form">
-                        <input class="file-input" id="file" type="file" name="file" accept=".xlsx,.xls" required>
-                        <div class="file-drop">
-                            <label class="file-pick" for="file">Excel dosyasi sec</label>
-                            <div class="file-name" id="file-name">Henuz dosya secilmedi.</div>
-                            <div class="helper-text">.xlsx, .xls</div>
-                        </div>
-                        <div>
-                            <button class="button-primary" id="submit-button" type="submit">Analizi baslat</button>
-                        </div>
-                    </form>
-                </div>
-            </article>
-        </section>
+            </form>
+        </article>
     </section>
 
     <script>

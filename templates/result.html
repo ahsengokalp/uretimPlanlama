@@ -5,29 +5,55 @@
 
 {% block top_actions %}
     <a class="nav-chip nav-chip--solid" href="/">Yeni Dosya</a>
-    <button type="button" class="nav-chip is-active" data-tab-target="overview">Genel Bakis</button>
-    <button type="button" class="nav-chip" data-tab-target="actions">Aksiyonlar</button>
-    <button type="button" class="nav-chip" data-tab-target="review">Inceleme</button>
-    <button type="button" class="nav-chip" data-tab-target="charts">Grafikler</button>
-    <button type="button" class="nav-chip" data-tab-target="ai">AI Ozet</button>
 {% endblock %}
 
 {% block content %}
+    <section class="hero-shell">
+        <div class="hero-copy">
+            <span class="hero-kicker">Guncel Gunluk Trend Analiz Sunumu</span>
+            <h1 class="hero-title">Sabah Toplanti Raporu</h1>
+            <p class="hero-subtitle">Bugun: {{ report_today }}</p>
+            <div class="hero-pills">
+                <span class="hero-pill">ISG / Kalite / Uretim: {{ operational_day }}</span>
+                <span class="hero-pill">Planlama: {{ planlama_day }}</span>
+                <span class="hero-pill">{% if ai_comment %}AI ozet hazir{% else %}AI ozet yok{% endif %}</span>
+            </div>
+        </div>
+        <div class="hero-glance">
+            <div class="hero-glance-card">
+                <span>Kritik</span>
+                <strong>{{ critical_count }}</strong>
+            </div>
+            <div class="hero-glance-card">
+                <span>Olumlu</span>
+                <strong>{{ success_count }}</strong>
+            </div>
+        </div>
+    </section>
+
     <section class="metric-grid">
         <article class="metric-card metric-card--span-3">
             <div class="metric-icon metric-icon--info">TK</div>
             <div class="metric-copy">
-                <span class="metric-label">Kayit</span>
-                <strong class="metric-value metric-value--lg">{{ daily_review|length }}</strong>
-                <span class="metric-help">Inceleme</span>
+                <span class="metric-label">Parametre</span>
+                <strong class="metric-value metric-value--lg">{{ parameter_summaries|length }}</strong>
+                <span class="metric-help">Ozet</span>
             </div>
         </article>
         <article class="metric-card metric-card--span-3">
             <div class="metric-icon metric-icon--danger">AK</div>
             <div class="metric-copy">
-                <span class="metric-label">Aksiyon</span>
-                <strong class="metric-value metric-value--lg">{{ actions|length }}</strong>
-                <span class="metric-help">Kritik</span>
+                <span class="metric-label">Kritik</span>
+                <strong class="metric-value metric-value--lg">{{ critical_count }}</strong>
+                <span class="metric-help">Oncelik</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--success">OK</div>
+            <div class="metric-copy">
+                <span class="metric-label">Olumlu</span>
+                <strong class="metric-value metric-value--lg">{{ success_count }}</strong>
+                <span class="metric-help">Durum</span>
             </div>
         </article>
         <article class="metric-card metric-card--span-3">
@@ -38,232 +64,501 @@
                 <span class="metric-help">Trend</span>
             </div>
         </article>
-        <article class="metric-card metric-card--span-3">
-            <div class="metric-icon {% if ai_comment %}metric-icon--success{% else %}metric-icon--warning{% endif %}">AI</div>
-            <div class="metric-copy">
-                <span class="metric-label">AI</span>
-                <strong class="metric-value metric-value--lg">{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
-                <span class="metric-help">Ozet</span>
-            </div>
-        </article>
     </section>
 
-    <div class="tab-pane is-active" data-tab-panel="overview">
-        <section class="layout-grid">
-            <aside class="card-shell">
+    <section class="workspace-grid">
+        <aside class="sidebar-stack">
+            <article class="card-shell">
+                <div class="card-head">
+                    <div>
+                        <h2>Bolumler</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="section-switcher section-switcher--sidebar">
+                        <button type="button" class="section-tab-button is-active" data-section-target="review">Inceleme</button>
+                        <button type="button" class="section-tab-button" data-section-target="actions">Cikarimlar</button>
+                        <button type="button" class="section-tab-button" data-section-target="charts">Grafikler</button>
+                        <button type="button" class="section-tab-button" data-section-target="ai">AI Degerlendirme</button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card-shell">
                 <div class="card-head">
                     <div>
                         <h2>Bugun</h2>
                     </div>
                 </div>
                 <div class="list-stack">
-                    {% if actions %}
-                        {% for item in actions[:6] %}
+                    {% if highlight_actions %}
+                        {% for item in highlight_actions %}
                             <div class="list-item">
                                 <div>
                                     <div class="list-title">{{ item.parametre }}</div>
-                                    <div class="list-meta">{{ item.kategori }} | Deger: {{ item.deger }}</div>
+                                    <div class="list-meta">{{ item.kategori }} | {{ item.relation_label or item.karsilastirma or item.deger_gosterim }}</div>
                                 </div>
-                                <span class="list-action">!</span>
+                                <span class="list-action list-action--{{ item.status }}">{{ item.status_label[0] }}</span>
                             </div>
                         {% endfor %}
-                    {% elif daily_review %}
-                        {% for row in daily_review[:6] %}
+                    {% elif parameter_summaries %}
+                        {% for row in parameter_summaries[:6] %}
                             <div class="list-item">
                                 <div>
                                     <div class="list-title">{{ row.parametre }}</div>
-                                    <div class="list-meta">{{ row.kategori }} | {{ row.inceleme_gunu }}</div>
+                                    <div class="list-meta">{{ row.kategori }} | {{ row.guncel_deger_gosterim }}</div>
                                 </div>
                                 <span class="list-action">i</span>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <div class="card-body empty-state">Bugun listelenecek kayit bulunmuyor.</div>
+                        <div class="card-body empty-state">Kayit yok.</div>
                     {% endif %}
                 </div>
-            </aside>
+            </article>
+        </aside>
 
-            <section class="stack">
+        <section class="content-stack">
+            <article class="card-shell">
+                <div class="card-head">
+                    <div>
+                        <h2>Genel Sonuc</h2>
+                        <p>Sunum mantigindaki ozet, cikarim ve trend akisi.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="summary-strip">
+                        <div class="summary-box">
+                            <span>Parametre</span>
+                            <strong>{{ parameter_summaries|length }}</strong>
+                        </div>
+                        <div class="summary-box">
+                            <span>Cikarim</span>
+                            <strong>{{ actions|length }}</strong>
+                        </div>
+                        <div class="summary-box">
+                            <span>Trend</span>
+                            <strong>{{ charts|length }}</strong>
+                        </div>
+                        <div class="summary-box">
+                            <span>AI</span>
+                            <strong>{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
+                        </div>
+                    </div>
+                    <div class="notice-panel accent-panel">{{ info_text }}</div>
+                </div>
+            </article>
+
+            <div class="tab-pane is-active" data-section-panel="review">
                 <article class="card-shell">
                     <div class="card-head">
                         <div>
-                            <h2>Genel Bakis</h2>
+                            <h2>Genel Veri Ozeti</h2>
+                            <p>Sunumdaki her parametre icin ortalama, maksimum ve minimum.</p>
                         </div>
+                        <span class="pill pill--info">{{ parameter_summaries|length }} parametre</span>
                     </div>
                     <div class="card-body">
-                        <div class="summary-strip">
-                            <div class="summary-box">
-                                <span>Sekme</span>
-                                <strong>Genel</strong>
+                        <div class="filter-bar" data-filter-panel="review">
+                            <div class="filter-group">
+                                <label class="filter-label" for="review-category">Kategori</label>
+                                <select class="filter-select" id="review-category" data-filter-control="category">
+                                    <option value="all">Tum kategoriler</option>
+                                    <option value="isg">ISG</option>
+                                    <option value="kalite">Kalite</option>
+                                    <option value="uretim">Uretim</option>
+                                    <option value="planlama">Planlama</option>
+                                </select>
                             </div>
-                            <div class="summary-box">
-                                <span>Aksiyon</span>
-                                <strong>{{ actions|length }}</strong>
+                            <div class="filter-group filter-group--search">
+                                <label class="filter-label" for="review-search">Ara</label>
+                                <input class="filter-input" id="review-search" type="search" placeholder="Parametre ara" data-filter-control="search">
                             </div>
-                            <div class="summary-box">
-                                <span>Kayit</span>
-                                <strong>{{ daily_review|length }}</strong>
-                            </div>
-                            <div class="summary-box">
-                                <span>Trend</span>
-                                <strong>{{ charts|length }}</strong>
-                            </div>
-                            <div class="summary-box">
-                                <span>AI</span>
-                                <strong>{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
-                            </div>
+                            <div class="filter-stat" data-filter-count="review">{{ parameter_summaries|length }} sonuc</div>
                         </div>
-                        <div class="notice-panel accent-panel">
-                            {{ info_text }}
-                        </div>
+                        {% if parameter_summaries %}
+                            <div class="summary-card-grid">
+                                {% for item in parameter_summaries %}
+                                    <article
+                                        class="summary-card summary-card--{{ item.kategori_tipi }}"
+                                        data-filter-item="review"
+                                        data-category="{{ item.kategori_tipi }}"
+                                        data-search="{{ item.kategori }} {{ item.parametre }}"
+                                    >
+                                        <div class="summary-card-top">
+                                            <span class="pill pill--{{ item.kategori_tipi }}">{{ item.kategori }}</span>
+                                            <span class="summary-date">{{ item.son_tarih }}</span>
+                                        </div>
+                                        <h3 class="summary-card-title">{{ item.parametre }}</h3>
+                                        <div class="stat-grid">
+                                            <div class="stat-item">
+                                                <span>Guncel</span>
+                                                <strong>{{ item.guncel_deger_gosterim }}</strong>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span>Ortalama</span>
+                                                <strong>{{ item.ortalama_gosterim }}</strong>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span>Maksimum</span>
+                                                <strong>{{ item.maksimum_gosterim }}</strong>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span>Minimum</span>
+                                                <strong>{{ item.minimum_gosterim }}</strong>
+                                            </div>
+                                        </div>
+                                        {% if item.hedef_gosterim %}
+                                            <div class="summary-meta-line">
+                                                <span>Hedef</span>
+                                                <strong>{{ item.hedef_gosterim }}</strong>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.karsilastirma %}
+                                            <div class="comparison-line">{{ item.karsilastirma }}</div>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                            <div class="empty-state filter-empty" data-filter-empty="review" hidden>Filtreye uygun parametre yok.</div>
+                        {% else %}
+                            <div class="empty-state">Parametre ozeti yok.</div>
+                        {% endif %}
                     </div>
                 </article>
-            </section>
-        </section>
-    </div>
-
-    <div class="tab-pane" data-tab-panel="actions">
-        <article class="card-shell">
-            <div class="card-head">
-                <div>
-                    <h2>Oncelikli Aksiyonlar</h2>
-                </div>
-                <span class="pill pill--danger">{{ actions|length }} kayit</span>
             </div>
-            <div class="card-body">
-                {% if actions %}
-                    <div class="action-list">
-                        {% for item in actions %}
-                            <article class="action-item">
-                                <div class="action-topline">
-                                    <span class="pill pill--danger">{{ item.kategori }}</span>
-                                    <span class="value-muted">Deger: {{ item.deger }}</span>
-                                </div>
-                                <h3 class="action-title">{{ item.parametre }}</h3>
-                                <p class="action-text">{{ item.yorum }}</p>
-                                {% if item.hedef is not none %}
-                                    <p class="value-muted">Hedef: {{ item.hedef }}</p>
-                                {% endif %}
-                            </article>
-                        {% endfor %}
+
+            <div class="tab-pane" data-section-panel="actions">
+                <article class="card-shell">
+                    <div class="card-head">
+                        <div>
+                            <h2>Cikarimlar / Aksiyonlar</h2>
+                            <p>Sunumdaki gibi olumlu ve kritik tum yorumlar.</p>
+                        </div>
+                        <span class="pill pill--danger">{{ actions|length }} kayit</span>
                     </div>
-                {% else %}
-                    <div class="empty-state">Kritik kayit yok.</div>
-                {% endif %}
-            </div>
-        </article>
-    </div>
-
-    <div class="tab-pane" data-tab-panel="review">
-        <article class="card-shell">
-            <div class="card-head">
-                <div>
-                    <h2>Gunluk Inceleme Tablosu</h2>
-                </div>
-                <span class="pill pill--info">{{ daily_review|length }} satir</span>
-            </div>
-            <div class="card-body">
-                {% if daily_review %}
-                    <div class="table-wrap">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Inceleme Gunu</th>
-                                    <th>Kategori</th>
-                                    <th>Parametre</th>
-                                    <th>Deger</th>
-                                    <th>Hedef</th>
-                                    <th>Yorum</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in daily_review %}
-                                    <tr>
-                                        <td><span class="date-box">{{ row.inceleme_gunu }}</span></td>
-                                        <td>{{ row.kategori }}</td>
-                                        <td>{{ row.parametre }}</td>
-                                        <td>{{ row.deger }}</td>
-                                        <td>
-                                            {% if row.hedef is not none %}
-                                                {{ row.hedef }}
-                                            {% else %}
-                                                <span class="muted-dash">-</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ row.yorum }}</td>
-                                    </tr>
+                    <div class="card-body">
+                        <div class="filter-bar" data-filter-panel="actions">
+                            <div class="filter-group">
+                                <label class="filter-label" for="actions-category">Kategori</label>
+                                <select class="filter-select" id="actions-category" data-filter-control="category">
+                                    <option value="all">Tum kategoriler</option>
+                                    <option value="isg">ISG</option>
+                                    <option value="kalite">Kalite</option>
+                                    <option value="uretim">Uretim</option>
+                                    <option value="planlama">Planlama</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label" for="actions-status">Durum</label>
+                                <select class="filter-select" id="actions-status" data-filter-control="status">
+                                    <option value="all">Tum durumlar</option>
+                                    <option value="danger">Kritik</option>
+                                    <option value="success">Olumlu</option>
+                                    <option value="warning">Uyari</option>
+                                    <option value="info">Bilgi</option>
+                                </select>
+                            </div>
+                            <div class="filter-group filter-group--search">
+                                <label class="filter-label" for="actions-search">Ara</label>
+                                <input class="filter-input" id="actions-search" type="search" placeholder="Parametre veya yorum ara" data-filter-control="search">
+                            </div>
+                            <div class="filter-stat" data-filter-count="actions">{{ actions|length }} sonuc</div>
+                        </div>
+                        {% if actions %}
+                            <div class="action-list">
+                                {% for item in actions %}
+                                    <article
+                                        class="action-item action-item--{{ item.status }}"
+                                        data-filter-item="actions"
+                                        data-category="{{ item.kategori_tipi }}"
+                                        data-status="{{ item.status }}"
+                                        data-search="{{ item.kategori }} {{ item.parametre }} {{ item.yorum }} {{ item.relation_label or '' }}"
+                                    >
+                                        <div class="action-topline">
+                                            <div class="action-pill-group">
+                                                <span class="pill pill--{{ item.kategori_tipi }}">{{ item.kategori }}</span>
+                                                <span class="pill pill--{{ item.status }}">{{ item.status_label }}</span>
+                                            </div>
+                                            <span class="date-box">{{ item.inceleme_gunu }}</span>
+                                        </div>
+                                        <h3 class="action-title">{{ item.parametre }}</h3>
+                                        {% if item.relation_label %}
+                                            <div class="action-relation">{{ item.relation_label }}</div>
+                                        {% endif %}
+                                        {% if item.karsilastirma %}
+                                            <div class="action-comparison">{{ item.karsilastirma }}</div>
+                                        {% endif %}
+                                        <p class="action-text">{{ item.yorum }}</p>
+                                    </article>
                                 {% endfor %}
-                            </tbody>
-                        </table>
+                            </div>
+                            <div class="empty-state filter-empty" data-filter-empty="actions" hidden>Filtreye uygun cikarim yok.</div>
+                        {% else %}
+                            <div class="empty-state">Kritik aksiyon yok.</div>
+                        {% endif %}
                     </div>
-                {% else %}
-                    <div class="empty-state">Kayit yok.</div>
-                {% endif %}
+                </article>
             </div>
-        </article>
-    </div>
 
-    <div class="tab-pane" data-tab-panel="charts">
-        <article class="card-shell">
-            <div class="card-head">
-                <div>
-                    <h2>Trend Grafikleri</h2>
-                </div>
-                <span class="pill pill--warning">{{ charts|length }} grafik</span>
+            <div class="tab-pane" data-section-panel="charts">
+                <article class="card-shell">
+                    <div class="card-head">
+                        <div>
+                            <h2>Trend Grafikleri</h2>
+                            <p>Parametre bazli canli grafik galerisi.</p>
+                        </div>
+                        <span class="pill pill--warning">{{ charts|length }} grafik</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="filter-bar" data-filter-panel="charts">
+                            <div class="filter-group">
+                                <label class="filter-label" for="charts-category">Kategori</label>
+                                <select class="filter-select" id="charts-category" data-filter-control="category">
+                                    <option value="all">Tum kategoriler</option>
+                                    <option value="isg">ISG</option>
+                                    <option value="kalite">Kalite</option>
+                                    <option value="uretim">Uretim</option>
+                                    <option value="planlama">Planlama</option>
+                                </select>
+                            </div>
+                            <div class="filter-group filter-group--search">
+                                <label class="filter-label" for="charts-search">Ara</label>
+                                <input class="filter-input" id="charts-search" type="search" placeholder="Grafik ara" data-filter-control="search">
+                            </div>
+                            <div class="filter-stat" data-filter-count="charts">{{ charts|length }} sonuc</div>
+                        </div>
+                        {% if charts %}
+                            <div class="chart-toolbar">
+                                <div class="chart-toolbar-copy">
+                                    <span class="chart-toolbar-label">Galeri</span>
+                                    <strong>{{ charts|length }} grafik</strong>
+                                </div>
+                                <div class="chart-controls">
+                                    <button type="button" class="carousel-button" data-chart-scroll="-1">&#8249;</button>
+                                    <button type="button" class="carousel-button" data-chart-scroll="1">&#8250;</button>
+                                </div>
+                            </div>
+                            <div class="chart-viewport" data-chart-viewport>
+                                <div class="chart-stack">
+                                    {% for chart in charts %}
+                                        <article
+                                            class="chart-item {% if loop.first %}is-active{% endif %}"
+                                            data-chart-item
+                                            data-filter-item="charts"
+                                            data-category="{{ chart.category_key }}"
+                                            data-search="{{ chart.subtitle }} {{ chart.title }}"
+                                        >
+                                            <div class="chart-meta">
+                                                {% if chart.subtitle %}
+                                                    <span class="pill pill--info">{{ chart.subtitle }}</span>
+                                                {% endif %}
+                                                <span class="chart-order" data-chart-order>{{ loop.index }}/{{ charts|length }}</span>
+                                            </div>
+                                            <h3>{{ chart.title }}</h3>
+                                            {{ chart.html | safe }}
+                                        </article>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="empty-state filter-empty" data-filter-empty="charts" hidden>Filtreye uygun grafik yok.</div>
+                        {% else %}
+                            <div class="empty-state">Grafik yok.</div>
+                        {% endif %}
+                    </div>
+                </article>
             </div>
-            <div class="card-body">
-                {% if charts %}
-                    <div class="chart-stack">
-                        {% for chart in charts %}
-                            <article class="chart-item">
-                                <h3>{{ chart.title }}</h3>
-                                {{ chart.html | safe }}
+
+            <div class="tab-pane" data-section-panel="ai">
+                <article class="card-shell">
+                    <div class="card-head">
+                        <div>
+                            <h2>AI Degerlendirme</h2>
+                            <p>Yonetici ozetini ve rapor yorumunu bu alanda gorursun.</p>
+                        </div>
+                        <span class="pill pill--info">{% if ai_comment_html %}Hazir{% else %}Bos{% endif %}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if ai_comment_html %}
+                            <article class="report-card">
+                                <div class="report-card-head">
+                                    <div>
+                                        <span class="report-kicker">AI Degerlendirme</span>
+                                        <h3>Rapor Ozeti ve Yonetici Yorumu</h3>
+                                    </div>
+                                    <span class="pill pill--info">Hazir</span>
+                                </div>
+                                <div class="report-prose">{{ ai_comment_html | safe }}</div>
                             </article>
-                        {% endfor %}
+                        {% else %}
+                            <div class="empty-state">AI ozeti yok.</div>
+                        {% endif %}
                     </div>
-                {% else %}
-                    <div class="empty-state">Grafik yok.</div>
-                {% endif %}
+                </article>
             </div>
-        </article>
-    </div>
-
-    <div class="tab-pane" data-tab-panel="ai">
-        <article class="card-shell">
-            <div class="card-head">
-                <div>
-                    <h2>AI Yonetici Ozeti</h2>
-                </div>
-                <span class="pill {% if ai_comment %}pill--success{% else %}pill--warning{% endif %}">
-                    {% if ai_comment %}Hazir{% else %}Uretilemedi{% endif %}
-                </span>
-            </div>
-            <div class="card-body">
-                {% if ai_comment %}
-                    <div class="notice-panel accent-panel">{{ ai_comment }}</div>
-                {% else %}
-                    <div class="empty-state">AI ozeti yok.</div>
-                {% endif %}
-            </div>
-        </article>
-    </div>
+        </section>
+    </section>
 
     <script>
-        const tabButtons = document.querySelectorAll("[data-tab-target]");
-        const tabPanels = document.querySelectorAll("[data-tab-panel]");
+        const sectionButtons = document.querySelectorAll("[data-section-target]");
+        const sectionPanels = document.querySelectorAll("[data-section-panel]");
+        const chartButtons = document.querySelectorAll("[data-chart-scroll]");
+        const chartItems = Array.from(document.querySelectorAll("[data-chart-item]"));
+        const filterPanels = document.querySelectorAll("[data-filter-panel]");
+        let currentChartIndex = 0;
 
-        function activateTab(target) {
-            tabButtons.forEach((button) => {
-                button.classList.toggle("is-active", button.dataset.tabTarget === target);
+        function normalizeText(value) {
+            return (value || "")
+                .toLocaleLowerCase("tr-TR")
+                .normalize("NFKD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/ı/g, "i");
+        }
+
+        function activateSection(target) {
+            sectionButtons.forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.sectionTarget === target);
             });
 
-            tabPanels.forEach((panel) => {
-                panel.classList.toggle("is-active", panel.dataset.tabPanel === target);
+            sectionPanels.forEach((panel) => {
+                panel.classList.toggle("is-active", panel.dataset.sectionPanel === target);
+            });
+
+            if (target === "charts") {
+                requestAnimationFrame(() => setActiveChart(currentChartIndex));
+            }
+        }
+
+        function getVisibleChartItems() {
+            return chartItems.filter((item) => !item.classList.contains("is-filter-hidden"));
+        }
+
+        function updateChartButtons() {
+            const visibleChartItems = getVisibleChartItems();
+            chartButtons.forEach((button) => {
+                const direction = Number(button.dataset.chartScroll || 0);
+                const isDisabled =
+                    !visibleChartItems.length ||
+                    (direction < 0 && currentChartIndex <= 0) ||
+                    (direction > 0 && currentChartIndex >= visibleChartItems.length - 1);
+                button.disabled = isDisabled;
             });
         }
 
-        tabButtons.forEach((button) => {
-            button.addEventListener("click", () => activateTab(button.dataset.tabTarget));
+        function setActiveChart(index) {
+            const visibleChartItems = getVisibleChartItems();
+            if (!visibleChartItems.length) {
+                chartItems.forEach((item) => item.classList.remove("is-active"));
+                currentChartIndex = 0;
+                updateChartButtons();
+                return;
+            }
+
+            currentChartIndex = Math.max(0, Math.min(index, visibleChartItems.length - 1));
+
+            chartItems.forEach((item, itemIndex) => {
+                item.classList.remove("is-active");
+            });
+
+            const activeItem = visibleChartItems[currentChartIndex];
+            activeItem.classList.add("is-active");
+
+            updateChartButtons();
+
+            requestAnimationFrame(() => {
+                if (!activeItem || !window.Plotly) return;
+
+                const plot = activeItem.querySelector(".js-plotly-plot, .plotly-graph-div");
+                if (plot) {
+                    window.Plotly.Plots.resize(plot);
+                }
+            });
+        }
+
+        function updateChartOrders() {
+            const visibleChartItems = getVisibleChartItems();
+            visibleChartItems.forEach((item, index) => {
+                const order = item.querySelector("[data-chart-order]");
+                if (order) {
+                    order.textContent = `${index + 1}/${visibleChartItems.length}`;
+                }
+            });
+        }
+
+        function applyFilters(sectionName) {
+            const panel = document.querySelector(`[data-filter-panel="${sectionName}"]`);
+            if (!panel) return;
+
+            const categoryControl = panel.querySelector('[data-filter-control="category"]');
+            const searchControl = panel.querySelector('[data-filter-control="search"]');
+            const statusControl = panel.querySelector('[data-filter-control="status"]');
+            const countNode = document.querySelector(`[data-filter-count="${sectionName}"]`);
+            const emptyNode = document.querySelector(`[data-filter-empty="${sectionName}"]`);
+            const items = Array.from(document.querySelectorAll(`[data-filter-item="${sectionName}"]`));
+
+            const categoryValue = categoryControl ? categoryControl.value : "all";
+            const searchValue = normalizeText(searchControl ? searchControl.value : "");
+            const statusValue = statusControl ? statusControl.value : "all";
+
+            let visibleCount = 0;
+
+            items.forEach((item) => {
+                const itemCategory = item.dataset.category || "";
+                const itemStatus = item.dataset.status || "";
+                const itemSearch = normalizeText(item.dataset.search || "");
+
+                const matchesCategory = categoryValue === "all" || itemCategory === categoryValue;
+                const matchesStatus = statusValue === "all" || itemStatus === statusValue;
+                const matchesSearch = !searchValue || itemSearch.includes(searchValue);
+                const visible = matchesCategory && matchesStatus && matchesSearch;
+
+                item.classList.toggle("is-filter-hidden", !visible);
+                if (visible) {
+                    visibleCount += 1;
+                }
+            });
+
+            if (countNode) {
+                countNode.textContent = `${visibleCount} sonuc`;
+            }
+
+            if (emptyNode) {
+                emptyNode.hidden = visibleCount !== 0;
+            }
+
+            if (sectionName === "charts") {
+                updateChartOrders();
+                setActiveChart(0);
+            }
+        }
+
+        sectionButtons.forEach((button) => {
+            button.addEventListener("click", () => activateSection(button.dataset.sectionTarget));
+        });
+
+        filterPanels.forEach((panel) => {
+            const sectionName = panel.dataset.filterPanel;
+            panel.querySelectorAll("[data-filter-control]").forEach((control) => {
+                control.addEventListener("input", () => applyFilters(sectionName));
+                control.addEventListener("change", () => applyFilters(sectionName));
+            });
+        });
+
+        chartButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const direction = Number(button.dataset.chartScroll || 0);
+                setActiveChart(currentChartIndex + direction);
+            });
+        });
+
+        applyFilters("review");
+        applyFilters("actions");
+        applyFilters("charts");
+        setActiveChart(0);
+        updateChartButtons();
+
+        window.addEventListener("resize", () => {
+            setActiveChart(currentChartIndex);
         });
     </script>
 {% endblock %}
