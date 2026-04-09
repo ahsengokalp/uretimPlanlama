@@ -1,76 +1,269 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>Analiz Sonucu</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 30px; background: #f7f7f7; }
-        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        .action { padding: 12px; border-left: 5px solid #d9534f; background: #fff8f8; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f0f0f0; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Analiz Sonucu</h1>
-        <p>{{ info_text }}</p>
-    </div>
+{% extends "base.html" %}
 
-    <div class="card">
-        <h2>AI Yönetici Yorumu</h2>
-        {% if ai_comment %}
-            <p>{{ ai_comment }}</p>
-        {% else %}
-            <p>AI yorumu oluşturulmadı.</p>
-        {% endif %}
-    </div>
+{% block title %}Analiz{% endblock %}
+{% block topbar_title %}Toplanti Sonuclari{% endblock %}
 
-    <div class="card">
-        <h2>Çıkarımlar / Aksiyonlar</h2>
-        {% for item in actions %}
-            <div class="action">
-                <strong>{{ item.kategori }} - {{ item.parametre }}</strong><br>
-                Değer: {{ item.deger }}<br>
-                Yorum: {{ item.yorum }}
+{% block top_actions %}
+    <a class="nav-chip nav-chip--solid" href="/">Yeni Dosya</a>
+    <button type="button" class="nav-chip is-active" data-tab-target="overview">Genel Bakis</button>
+    <button type="button" class="nav-chip" data-tab-target="actions">Aksiyonlar</button>
+    <button type="button" class="nav-chip" data-tab-target="review">Inceleme</button>
+    <button type="button" class="nav-chip" data-tab-target="charts">Grafikler</button>
+    <button type="button" class="nav-chip" data-tab-target="ai">AI Ozet</button>
+{% endblock %}
+
+{% block content %}
+    <section class="metric-grid">
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--info">TK</div>
+            <div class="metric-copy">
+                <span class="metric-label">Kayit</span>
+                <strong class="metric-value metric-value--lg">{{ daily_review|length }}</strong>
+                <span class="metric-help">Inceleme</span>
             </div>
-        {% endfor %}
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--danger">AK</div>
+            <div class="metric-copy">
+                <span class="metric-label">Aksiyon</span>
+                <strong class="metric-value metric-value--lg">{{ actions|length }}</strong>
+                <span class="metric-help">Kritik</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--warning">GR</div>
+            <div class="metric-copy">
+                <span class="metric-label">Grafik</span>
+                <strong class="metric-value metric-value--lg">{{ charts|length }}</strong>
+                <span class="metric-help">Trend</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon {% if ai_comment %}metric-icon--success{% else %}metric-icon--warning{% endif %}">AI</div>
+            <div class="metric-copy">
+                <span class="metric-label">AI</span>
+                <strong class="metric-value metric-value--lg">{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
+                <span class="metric-help">Ozet</span>
+            </div>
+        </article>
+    </section>
+
+    <div class="tab-pane is-active" data-tab-panel="overview">
+        <section class="layout-grid">
+            <aside class="card-shell">
+                <div class="card-head">
+                    <div>
+                        <h2>Bugun</h2>
+                    </div>
+                </div>
+                <div class="list-stack">
+                    {% if actions %}
+                        {% for item in actions[:6] %}
+                            <div class="list-item">
+                                <div>
+                                    <div class="list-title">{{ item.parametre }}</div>
+                                    <div class="list-meta">{{ item.kategori }} | Deger: {{ item.deger }}</div>
+                                </div>
+                                <span class="list-action">!</span>
+                            </div>
+                        {% endfor %}
+                    {% elif daily_review %}
+                        {% for row in daily_review[:6] %}
+                            <div class="list-item">
+                                <div>
+                                    <div class="list-title">{{ row.parametre }}</div>
+                                    <div class="list-meta">{{ row.kategori }} | {{ row.inceleme_gunu }}</div>
+                                </div>
+                                <span class="list-action">i</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card-body empty-state">Bugun listelenecek kayit bulunmuyor.</div>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <section class="stack">
+                <article class="card-shell">
+                    <div class="card-head">
+                        <div>
+                            <h2>Genel Bakis</h2>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="summary-strip">
+                            <div class="summary-box">
+                                <span>Sekme</span>
+                                <strong>Genel</strong>
+                            </div>
+                            <div class="summary-box">
+                                <span>Aksiyon</span>
+                                <strong>{{ actions|length }}</strong>
+                            </div>
+                            <div class="summary-box">
+                                <span>Kayit</span>
+                                <strong>{{ daily_review|length }}</strong>
+                            </div>
+                            <div class="summary-box">
+                                <span>Trend</span>
+                                <strong>{{ charts|length }}</strong>
+                            </div>
+                            <div class="summary-box">
+                                <span>AI</span>
+                                <strong>{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
+                            </div>
+                        </div>
+                        <div class="notice-panel accent-panel">
+                            {{ info_text }}
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </section>
     </div>
 
-    <div class="card">
-        <h2>Günlük İnceleme</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>İnceleme Günü</th>
-                    <th>Kategori</th>
-                    <th>Parametre</th>
-                    <th>Değer</th>
-                    <th>Hedef</th>
-                    <th>Yorum</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in daily_review %}
-                <tr>
-                    <td>{{ row.inceleme_gunu }}</td>
-                    <td>{{ row.kategori }}</td>
-                    <td>{{ row.parametre }}</td>
-                    <td>{{ row.deger }}</td>
-                    <td>{{ row.hedef }}</td>
-                    <td>{{ row.yorum }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="tab-pane" data-tab-panel="actions">
+        <article class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>Oncelikli Aksiyonlar</h2>
+                </div>
+                <span class="pill pill--danger">{{ actions|length }} kayit</span>
+            </div>
+            <div class="card-body">
+                {% if actions %}
+                    <div class="action-list">
+                        {% for item in actions %}
+                            <article class="action-item">
+                                <div class="action-topline">
+                                    <span class="pill pill--danger">{{ item.kategori }}</span>
+                                    <span class="value-muted">Deger: {{ item.deger }}</span>
+                                </div>
+                                <h3 class="action-title">{{ item.parametre }}</h3>
+                                <p class="action-text">{{ item.yorum }}</p>
+                                {% if item.hedef is not none %}
+                                    <p class="value-muted">Hedef: {{ item.hedef }}</p>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">Kritik kayit yok.</div>
+                {% endif %}
+            </div>
+        </article>
     </div>
 
-    {% for chart in charts %}
-    <div class="card">
-        <h2>{{ chart.title }}</h2>
-        {{ chart.html | safe }}
+    <div class="tab-pane" data-tab-panel="review">
+        <article class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>Gunluk Inceleme Tablosu</h2>
+                </div>
+                <span class="pill pill--info">{{ daily_review|length }} satir</span>
+            </div>
+            <div class="card-body">
+                {% if daily_review %}
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Inceleme Gunu</th>
+                                    <th>Kategori</th>
+                                    <th>Parametre</th>
+                                    <th>Deger</th>
+                                    <th>Hedef</th>
+                                    <th>Yorum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in daily_review %}
+                                    <tr>
+                                        <td><span class="date-box">{{ row.inceleme_gunu }}</span></td>
+                                        <td>{{ row.kategori }}</td>
+                                        <td>{{ row.parametre }}</td>
+                                        <td>{{ row.deger }}</td>
+                                        <td>
+                                            {% if row.hedef is not none %}
+                                                {{ row.hedef }}
+                                            {% else %}
+                                                <span class="muted-dash">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ row.yorum }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">Kayit yok.</div>
+                {% endif %}
+            </div>
+        </article>
     </div>
-    {% endfor %}
-</body>
-</html>
+
+    <div class="tab-pane" data-tab-panel="charts">
+        <article class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>Trend Grafikleri</h2>
+                </div>
+                <span class="pill pill--warning">{{ charts|length }} grafik</span>
+            </div>
+            <div class="card-body">
+                {% if charts %}
+                    <div class="chart-stack">
+                        {% for chart in charts %}
+                            <article class="chart-item">
+                                <h3>{{ chart.title }}</h3>
+                                {{ chart.html | safe }}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">Grafik yok.</div>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+
+    <div class="tab-pane" data-tab-panel="ai">
+        <article class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>AI Yonetici Ozeti</h2>
+                </div>
+                <span class="pill {% if ai_comment %}pill--success{% else %}pill--warning{% endif %}">
+                    {% if ai_comment %}Hazir{% else %}Uretilemedi{% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                {% if ai_comment %}
+                    <div class="notice-panel accent-panel">{{ ai_comment }}</div>
+                {% else %}
+                    <div class="empty-state">AI ozeti yok.</div>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+
+    <script>
+        const tabButtons = document.querySelectorAll("[data-tab-target]");
+        const tabPanels = document.querySelectorAll("[data-tab-panel]");
+
+        function activateTab(target) {
+            tabButtons.forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.tabTarget === target);
+            });
+
+            tabPanels.forEach((panel) => {
+                panel.classList.toggle("is-active", panel.dataset.tabPanel === target);
+            });
+        }
+
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => activateTab(button.dataset.tabTarget));
+        });
+    </script>
+{% endblock %}

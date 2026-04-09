@@ -1,24 +1,130 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>Sabah Toplantısı Analiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f7f7f7; }
-        .box { background: white; padding: 24px; border-radius: 12px; max-width: 700px; margin: auto; }
-        h1 { margin-top: 0; }
-        input, button { margin-top: 12px; }
-        button { padding: 10px 16px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h1>Sabah Toplantısı Analiz Paneli</h1>
-        <form action="/analyze" method="post" enctype="multipart/form-data">
-            <label>Excel dosyasını yükle:</label><br>
-            <input type="file" name="file" accept=".xlsx,.xls" required><br>
-            <button type="submit">Analiz Et</button>
-        </form>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Uretim Toplanti Asistani{% endblock %}
+{% block topbar_title %}Toplanti Paneli{% endblock %}
+
+{% block top_actions %}
+    <a class="nav-chip nav-chip--solid" href="/">Yukleme</a>
+{% endblock %}
+
+{% block content %}
+    <section class="metric-grid">
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--info">XL</div>
+            <div class="metric-copy">
+                <span class="metric-label">Dosya</span>
+                <strong class="metric-value metric-value--lg">Excel</strong>
+                <span class="metric-help">.xlsx veya .xls</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--success">VR</div>
+            <div class="metric-copy">
+                <span class="metric-label">Sayfa</span>
+                <strong class="metric-value metric-value--lg">Veriler</strong>
+                <span class="metric-help">Kategori + Parametre</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--warning">AI</div>
+            <div class="metric-copy">
+                <span class="metric-label">AI</span>
+                <strong class="metric-value metric-value--lg">Opsiyonel</strong>
+                <span class="metric-help">Ozet</span>
+            </div>
+        </article>
+        <article class="metric-card metric-card--span-3">
+            <div class="metric-icon metric-icon--danger">AK</div>
+            <div class="metric-copy">
+                <span class="metric-label">Cikti</span>
+                <strong class="metric-value metric-value--lg">Aksiyonlar</strong>
+                <span class="metric-help">Inceleme + grafik</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="upload-grid">
+        <aside class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>Hazirlik Notlari</h2>
+                </div>
+            </div>
+            <div class="list-stack">
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">Veriler sayfasi</div>
+                        <div class="list-meta">Zorunlu</div>
+                    </div>
+                    <span class="list-action">1</span>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">Kategori / Parametre</div>
+                        <div class="list-meta">Ilk iki sutun</div>
+                    </div>
+                    <span class="list-action">2</span>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">Tarih kolonlari</div>
+                        <div class="list-meta">3. sutundan sonra</div>
+                    </div>
+                    <span class="list-action">3</span>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">Hedef satirlari</div>
+                        <div class="list-meta">Varsa okunur</div>
+                    </div>
+                    <span class="list-action">4</span>
+                </div>
+            </div>
+        </aside>
+
+        <section class="stack">
+            <article class="card-shell">
+                <div class="card-head">
+                    <div>
+                        <h2>Dosya Yukle</h2>
+                    </div>
+                </div>
+                <div class="card-body upload-box">
+                    <div>
+                        <h1 class="page-title">Sabah toplanti analizi</h1>
+                        <p class="page-subtitle">Excel dosyanizi secip analizi baslatin.</p>
+                    </div>
+
+                    <form class="upload-form" action="/analyze" method="post" enctype="multipart/form-data" id="upload-form">
+                        <input class="file-input" id="file" type="file" name="file" accept=".xlsx,.xls" required>
+                        <div class="file-drop">
+                            <label class="file-pick" for="file">Excel dosyasi sec</label>
+                            <div class="file-name" id="file-name">Henuz dosya secilmedi.</div>
+                            <div class="helper-text">.xlsx, .xls</div>
+                        </div>
+                        <div>
+                            <button class="button-primary" id="submit-button" type="submit">Analizi baslat</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        </section>
+    </section>
+
+    <script>
+        const fileInput = document.getElementById("file");
+        const fileName = document.getElementById("file-name");
+        const submitButton = document.getElementById("submit-button");
+        const uploadForm = document.getElementById("upload-form");
+
+        fileInput.addEventListener("change", () => {
+            const selected = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "Henuz dosya secilmedi.";
+            fileName.textContent = selected;
+        });
+
+        uploadForm.addEventListener("submit", () => {
+            submitButton.disabled = true;
+            submitButton.textContent = "Analiz hazirlaniyor...";
+        });
+    </script>
+{% endblock %}

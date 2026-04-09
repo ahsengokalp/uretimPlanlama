@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block topbar_title %}Uyari{% endblock %}
+
+{% block top_actions %}
+    <a class="nav-chip nav-chip--solid" href="/">Ana Panel</a>
+{% endblock %}
+
+{% block content %}
+    <section class="error-wrap">
+        <article class="card-shell">
+            <div class="card-head">
+                <div>
+                    <h2>{{ title }}</h2>
+                </div>
+                <span class="pill pill--danger">Uyari</span>
+            </div>
+            <div class="card-body stack">
+                <div class="notice-panel accent-panel">{{ message }}</div>
+                {% if detail %}
+                    <div class="notice-panel">{{ detail }}</div>
+                {% endif %}
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <a class="button-primary" href="/">Yukleme ekranina don</a>
+                    <a class="button-secondary" href="javascript:history.back()">Bir onceki sayfa</a>
+                </div>
+            </div>
+        </article>
+    </section>
+{% endblock %}
