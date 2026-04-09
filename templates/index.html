@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sabah Toplantısı Analiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f7f7f7; }
+        .box { background: white; padding: 24px; border-radius: 12px; max-width: 700px; margin: auto; }
+        h1 { margin-top: 0; }
+        input, button { margin-top: 12px; }
+        button { padding: 10px 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Sabah Toplantısı Analiz Paneli</h1>
+        <form action="/analyze" method="post" enctype="multipart/form-data">
+            <label>Excel dosyasını yükle:</label><br>
+            <input type="file" name="file" accept=".xlsx,.xls" required><br>
+            <button type="submit">Analiz Et</button>
+        </form>
+    </div>
+</body>
+</html>
