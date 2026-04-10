@@ -11,13 +11,15 @@
     <section class="hero-shell">
         <div class="hero-copy">
             <span class="hero-kicker">Guncel Gunluk Trend Analiz Sunumu</span>
-            <h1 class="hero-title">Sabah Toplanti Raporu</h1>
-            <p class="hero-subtitle">Bugun: {{ report_today }}</p>
-            <div class="hero-pills">
-                <span class="hero-pill">ISG / Kalite / Uretim: {{ operational_day }}</span>
-                <span class="hero-pill">Planlama: {{ planlama_day }}</span>
-                <span class="hero-pill">{% if ai_comment %}AI ozet hazir{% else %}AI ozet yok{% endif %}</span>
+            <div class="hero-title-row">
+                <h1 class="hero-title">Sabah Toplanti Raporu</h1>
+                <div class="hero-pills hero-pills--inline">
+                    <span class="hero-pill">ISG / Kalite / Uretim: {{ operational_day }}</span>
+                    <span class="hero-pill">Planlama: {{ planlama_day }}</span>
+                    <span class="hero-pill">{% if ai_comment %}AI ozet hazir{% else %}AI ozet yok{% endif %}</span>
+                </div>
             </div>
+            <p class="hero-subtitle">Bugun: {{ report_today }}</p>
         </div>
         <div class="hero-glance">
             <div class="hero-glance-card">

@@ -142,9 +142,9 @@ a {
 .hero-shell {
     display: grid;
     grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 14px;
-    padding: 24px;
+    padding: 20px 22px;
     border: 1px solid rgba(15, 106, 242, 0.14);
     border-radius: 26px;
     background:
@@ -173,6 +173,12 @@ a {
     z-index: 1;
 }
 
+.hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .hero-kicker {
     display: inline-flex;
     align-items: center;
@@ -187,34 +193,45 @@ a {
 }
 
 .hero-title {
-    margin: 14px 0 10px;
+    margin: 0;
     font-size: clamp(28px, 4vw, 42px);
     line-height: 1;
     letter-spacing: -0.04em;
 }
 
+.hero-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 8px;
+}
+
 .hero-subtitle {
     margin: 0;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .hero-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 8px;
+}
+
+.hero-pills--inline {
+    justify-content: flex-end;
 }
 
 .hero-pill {
     display: inline-flex;
     align-items: center;
-    min-height: 34px;
-    padding: 0 14px;
+    min-height: 30px;
+    padding: 0 12px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -227,7 +244,7 @@ a {
 }
 
 .hero-glance-card {
-    padding: 14px 16px;
+    padding: 12px 15px;
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.13);
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -243,7 +260,7 @@ a {
 
 .hero-glance-card strong {
     display: block;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 800;
 }
 
@@ -1418,6 +1435,15 @@ a {
         grid-column: 1 / -1;
         justify-self: start;
     }
+
+    .hero-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-pills--inline {
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 760px) {
@@ -1460,6 +1486,10 @@ a {
 
     .hero-glance {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .hero-title-row {
+        gap: 10px;
     }
 
     .chart-toolbar {
