@@ -204,4 +204,4 @@ def analyze():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="172.16.49.50", port=5053, debug=True)
