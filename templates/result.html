@@ -24,16 +24,6 @@
             </div>
             <p class="hero-subtitle">Bugun: {{ report_today }}</p>
         </div>
-        <div class="hero-glance">
-            <div class="hero-glance-card">
-                <span>Kritik</span>
-                <strong>{{ critical_count }}</strong>
-            </div>
-            <div class="hero-glance-card">
-                <span>Olumlu</span>
-                <strong>{{ success_count }}</strong>
-            </div>
-        </div>
     </section>
 
     <section class="metric-grid">
@@ -126,24 +116,7 @@
         <section class="content-stack">
             <div class="tab-pane is-active" data-section-panel="review">
                 <article class="card-shell">
-                    <div class="card-head">
-                        <div>
-                            <h2>Genel Veri Ozeti</h2>
-                            <p>Sunumdaki her parametre icin ortalama, maksimum ve minimum.</p>
-                        </div>
-                        <span class="pill pill--info">{{ parameter_summaries|length }} parametre</span>
-                    </div>
                     <div class="card-body">
-                        {% if persistence_result %}
-                            <div class="notice-panel {% if persistence_result.ok %}notice-panel--ai{% else %}notice-panel--warning{% endif %}">
-                                {{ persistence_result.message }}
-                                {% if persistence_result.submission_id %}
-                                    <br>
-                                    Kayit ID: {{ persistence_result.submission_id }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                        <div class="notice-panel accent-panel">{{ info_text }}</div>
                         <div class="filter-bar" data-filter-panel="review">
                             <div class="filter-group">
                                 <label class="filter-label" for="review-category">Kategori</label>

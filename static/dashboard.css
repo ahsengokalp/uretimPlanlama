@@ -1465,8 +1465,8 @@ a {
 }
 
 .field-input--table {
-    min-height: 36px;
-    border-radius: 9px;
+    min-height: 28px;
+    border-radius: 6px;
 }
 
 .manual-section {
@@ -1597,10 +1597,10 @@ a {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    max-height: min(68vh, 720px);
+    max-height: min(66vh, 680px);
     overflow: auto;
     border: 1px solid #e1e8f2;
-    border-radius: 12px;
+    border-radius: 10px;
     background: #fff;
     overscroll-behavior: contain;
     cursor: grab;
@@ -1619,12 +1619,12 @@ a {
 .manual-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1440px;
+    min-width: 1120px;
 }
 
 .manual-table th,
 .manual-table td {
-    padding: 8px 9px;
+    padding: 5px 6px;
     border-bottom: 1px solid #e6edf7;
     text-align: left;
     vertical-align: middle;
@@ -1633,9 +1633,9 @@ a {
 .manual-table th {
     background: #f8fafc;
     color: #516274;
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 800;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     white-space: nowrap;
 }
@@ -1650,15 +1650,19 @@ a {
 .manual-date-head-content {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 3px;
 }
 
 .manual-date-head-label {
     text-transform: none;
+    font-size: 9px;
 }
 
 .manual-date-head-remove {
     flex: 0 0 auto;
+    width: 18px;
+    min-height: 18px;
+    font-size: 9px;
 }
 
 .manual-table th:first-child,
@@ -1666,18 +1670,18 @@ a {
     position: sticky;
     left: 0;
     z-index: 4;
-    min-width: 112px;
-    max-width: 112px;
+    min-width: 96px;
+    max-width: 96px;
     background: #fff;
 }
 
 .manual-table th:nth-child(2),
 .manual-table td:nth-child(2) {
     position: sticky;
-    left: 112px;
+    left: 96px;
     z-index: 4;
-    min-width: 190px;
-    max-width: 190px;
+    min-width: 164px;
+    max-width: 164px;
     background: #fff;
 }
 
@@ -1692,20 +1696,20 @@ a {
 }
 
 .manual-date-cell {
-    min-width: 104px;
+    min-width: 68px;
 }
 
 .manual-table .field-input--table {
     min-width: 100%;
-    padding: 0 10px;
-    font-size: 13px;
+    padding: 0 5px;
+    font-size: 10px;
 }
 
 .manual-fixed-cell {
     font-weight: 600;
     color: #2f4661;
-    font-size: 14px;
-    line-height: 1.25;
+    font-size: 13px;
+    line-height: 1.2;
 }
 
 .manual-hint {

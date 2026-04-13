@@ -165,7 +165,7 @@
         const loadSubmissionButtons = Array.from(document.querySelectorAll("[data-load-submission]"));
         const deleteSubmissionButtons = Array.from(document.querySelectorAll("[data-delete-submission]"));
 
-        const templateRows = {{ template_rows|tojson }};
+        const templateRows = JSON.parse('{{ template_rows|tojson|safe }}');
         let manualDateCounter = 0;
         let manualDragState = null;
         let manualSubmitInProgress = false;
@@ -177,7 +177,6 @@
             return parsed.toLocaleDateString("tr-TR", {
                 day: "2-digit",
                 month: "short",
-                year: "numeric",
             });
         }
 

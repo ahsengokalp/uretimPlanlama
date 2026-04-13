@@ -672,11 +672,6 @@ def analyze_raw_dataframe(raw_df, display_map=None):
         "parametre_ozetleri": parameter_summaries,
     }
 
-    info_text = (
-        f"ISG / Kalite / Uretim icin {operational_day.date()} verileri, "
-        f"Planlama icin {planlama_day.date()} verileri yorumlandi."
-    )
-
     return {
         "charts": charts,
         "daily_review": daily_review,
@@ -684,7 +679,6 @@ def analyze_raw_dataframe(raw_df, display_map=None):
         "highlight_actions": highlight_actions,
         "parameter_summaries": parameter_summaries,
         "summary_for_ai": summary_for_ai,
-        "info_text": info_text,
         "operational_day": str(operational_day.date()),
         "planlama_day": str(planlama_day.date()),
     }

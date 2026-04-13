@@ -408,7 +408,6 @@ def render_analysis_result(result, source_name=None, source_kind="Excel yukleme"
         parameter_summaries=result["parameter_summaries"],
         ai_comment=ai_comment,
         ai_comment_html=ai_comment_html,
-        info_text=result["info_text"],
         report_today=format_tr_date(report_today),
         operational_day=result["operational_day"],
         planlama_day=result["planlama_day"],
