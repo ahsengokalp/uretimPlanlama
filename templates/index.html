@@ -6,79 +6,81 @@
 
 {% block content %}
     <section class="landing-shell landing-shell--workspace">
-        <div class="landing-grid">
-            <article class="landing-card landing-card--compact">
-                <div class="landing-copy">
-                    <span class="landing-kicker">Excel Yukleme</span>
-                    <h1 class="landing-title landing-title--compact">Hazir dosyayi yukle</h1>
-                    <p class="landing-text">Mevcut akisi koru. Tek bir Excel dosyasi yukleyip analizi hemen baslat.</p>
-                    <div class="landing-tags">
-                        <span class="landing-tag">Veriler sayfasi</span>
-                        <span class="landing-tag">Kategori + Parametre</span>
-                        <span class="landing-tag">Tarih kolonlari</span>
-                        <span class="landing-tag">.xlsx / .xls</span>
+        <div class="landing-simple">
+            <header class="landing-hero-simple">
+                <span class="landing-kicker">Uretim Toplanti Asistani</span>
+                <h1 class="landing-title landing-title--simple">Sabah toplantisina veri hazirla</h1>
+                <p class="landing-text landing-text--simple">Mevcut Excel dosyasini yukleyebilir ya da veriyi burada girip dogrudan analiz ve kayit akisini kullanabilirsin.</p>
+            </header>
+
+            <article class="entry-panel entry-panel--upload">
+                <div class="entry-panel-head">
+                    <div>
+                        <h2>Excel ile devam et</h2>
+                        <p>Hazir dosyan varsa sec; sistem verileri asagidaki veri satirlari alanina otomatik aktarsin.</p>
                     </div>
                 </div>
 
-                <form class="upload-form upload-form--landing" action="/analyze" method="post" enctype="multipart/form-data" id="upload-form">
+                <div class="upload-form upload-form--simple" id="upload-form">
                     <input class="file-input" id="file" type="file" name="file" accept=".xlsx,.xls" required>
-                    <label class="file-drop file-drop--landing" for="file">
-                        <span class="file-drop-badge">XL</span>
-                        <span class="file-drop-title">Excel dosyasini sec</span>
-                        <span class="file-name" id="file-name">Henuz dosya secilmedi.</span>
-                        <span class="helper-text">Desteklenen bicimler: .xlsx ve .xls</span>
-                    </label>
-                    <div class="landing-actions">
-                        <button class="button-primary button-primary--wide" id="submit-button" type="submit">Analizi baslat</button>
-                        <p class="landing-note">Ilk iki sutun `Kategori` ve `Parametre` olmali.</p>
+                    <div class="upload-inline-row">
+                        <label class="button-secondary button-secondary--file" for="file">Excel dosyasini sec</label>
+                        <span class="file-name file-name--inline" id="file-name">Henuz dosya secilmedi.</span>
                     </div>
-                </form>
+                    <div class="landing-actions landing-actions--inline">
+                        <p class="landing-note">Beklenen yapi: `Veriler` sayfasi, ilk iki sutun `Kategori` ve `Parametre`. Secilen dosya veri satirlarini otomatik doldurur.</p>
+                    </div>
+                    <p class="manual-hint" id="upload-status">Bir Excel sectiginde veri satirlari bolumu otomatik dolar.</p>
+                </div>
             </article>
 
-            <article class="landing-card landing-card--manual">
-                <div class="landing-copy">
-                    <span class="landing-kicker">Manuel Veri Olustur</span>
-                    <h2 class="landing-title landing-title--compact">Excel olmadan basla</h2>
-                    <p class="landing-text">Kullanici once tarihleri ve satirlari girsin, sistem ayni formatta Excel olusturup analizi calistirsin.</p>
-                    <div class="landing-tags">
-                        <span class="landing-tag">Tarih ekle</span>
-                        <span class="landing-tag">Satir ekle</span>
-                        <span class="landing-tag">Excel otomatik olussun</span>
+            <article class="entry-panel entry-panel--manual">
+                <div class="entry-panel-head">
+                    <div>
+                        <h2>Veriyi burada olustur</h2>
+                        <p>Excel olmadan basla. Tarihleri ve satirlari gir, sistem veriyi analiz edip veri tabanina kaydetsin.</p>
+                        {% if template_name %}
+                            <p class="entry-panel-note">Sablon: {{ template_name }}. Parametre listesi bu ornekten geliyor; girdigin manuel veriler PostgreSQL veri tabanina kaydedilir.</p>
+                        {% endif %}
                     </div>
                 </div>
 
                 <form class="manual-form" action="/analyze-manual" method="post" id="manual-form">
                     <input type="hidden" name="manual_payload" id="manual-payload">
 
-                    <div class="manual-toolbar">
-                        <label class="field-group">
-                            <span class="field-label">Olusacak Excel adi</span>
-                            <input class="field-input" id="manual-filename" type="text" value="manuel_veri" placeholder="manuel_veri">
-                        </label>
-                        <div class="manual-toolbar-actions">
-                            <button class="button-secondary" type="button" id="add-date-button">Tarih ekle</button>
-                            <button class="button-secondary" type="button" id="add-row-button">Satir ekle</button>
-                        </div>
-                    </div>
-
                     <section class="manual-section">
                         <div class="manual-section-head">
                             <div>
                                 <h3>Tarih kolonlari</h3>
-                                <p>Exceldeki tarih kolonlarini burada olustur.</p>
+                                <p>Baslangic ve bitis tarihini secip araligi tek seferde olustur.</p>
                             </div>
                         </div>
-                        <div class="manual-date-list" id="manual-date-list"></div>
+                        <div class="manual-range-grid">
+                            <label class="field-group">
+                                <span class="field-label">Baslangic</span>
+                                <input class="field-input" id="range-start" type="date">
+                            </label>
+                            <label class="field-group">
+                                <span class="field-label">Bitis</span>
+                                <input class="field-input" id="range-end" type="date">
+                            </label>
+                            <div class="manual-range-actions">
+                                <button class="button-secondary" type="button" id="generate-range-button">Araligi olustur</button>
+                                <button class="button-secondary" type="button" id="add-date-button">Sonraki gunu ekle</button>
+                                <button class="button-secondary" type="button" id="clear-dates-button">Temizle</button>
+                            </div>
+                        </div>
+                        <div class="manual-date-list" id="manual-date-list" hidden aria-hidden="true" style="display: none !important;"></div>
                     </section>
 
                     <section class="manual-section">
                         <div class="manual-section-head">
                             <div>
                                 <h3>Veri satirlari</h3>
-                                <p>Kategori ve parametre gir, tarih bazli degerleri doldur.</p>
+                                <p>Kategori ve parametre gir, tarih bazli degerleri doldur. Tablo alanini fareyle tutup saga sola ya da asagi yukari kaydirabilirsin.</p>
                             </div>
                         </div>
-                        <div class="manual-table-wrap">
+                        <div class="manual-table-wrap" id="manual-table-wrap">
                             <table class="manual-table">
                                 <thead>
                                     <tr>
@@ -91,14 +93,64 @@
                                 <tbody id="manual-table-body"></tbody>
                             </table>
                         </div>
+                        <div class="manual-table-actions">
+                            <button class="button-secondary" type="button" id="add-row-button">Satir ekle</button>
+                        </div>
                         <p class="manual-hint">Yuzdeli parametrelerde `4` girersen sistem bunu `%4` olarak kaydeder.</p>
                     </section>
 
-                    <div class="landing-actions">
-                        <button class="button-primary button-primary--wide" id="manual-submit-button" type="submit">Veriyi olustur ve analiz et</button>
-                        <p class="landing-note">Analiz sonunda istersen olusan Excel dosyasini indirip tekrar kullanabilirsin.</p>
+                    <div class="landing-actions landing-actions--inline">
+                        <button class="button-primary" id="manual-submit-button" type="submit">Analiz et ve kaydet</button>
+                        <p class="landing-note">Bu akista veri Excel dosyasi olusturulmadan dogrudan PostgreSQL veri tabanina kaydedilir.</p>
                     </div>
                 </form>
+            </article>
+
+            <article class="entry-panel entry-panel--history">
+                <div class="entry-panel-head">
+                    <div>
+                        <h2>Kayitli veri setleri</h2>
+                        <p>Daha once kaydettigin manuel girisleri burada gorup forma geri yukleyebilirsin.</p>
+                        {% if manual_history_error %}
+                            <p class="entry-panel-note entry-panel-note--warning">{{ manual_history_error }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <p class="manual-hint" id="manual-history-status" hidden></p>
+
+                {% if manual_history %}
+                    <div class="history-stack" id="history-stack">
+                        {% for record in manual_history %}
+                            <article class="history-item" data-history-item="{{ record.id }}">
+                                <div class="history-copy">
+                                    <div class="history-title-row">
+                                        <h3>{{ record.display_name }}</h3>
+                                        <span class="history-badge">{{ record.row_count }} satir</span>
+                                    </div>
+                                    <p class="history-meta">{{ record.date_range_label }} | {{ record.filled_value_count }} deger</p>
+                                </div>
+                                <div class="history-actions">
+                                    <button
+                                        class="button-secondary"
+                                        type="button"
+                                        data-load-submission="{{ record.id }}"
+                                        data-display-name="{{ record.display_name }}"
+                                    >Forma yukle</button>
+                                    <button
+                                        class="button-secondary button-secondary--danger"
+                                        type="button"
+                                        data-delete-submission="{{ record.id }}"
+                                        data-display-name="{{ record.display_name }}"
+                                    >Sil</button>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if not manual_history_error %}
+                    <div class="empty-state empty-state--inline" id="history-empty-state" {% if manual_history %}hidden{% endif %}>Henuz kayitli manuel veri seti yok.</div>
+                {% endif %}
             </article>
         </div>
     </section>
@@ -106,21 +158,31 @@
     <script>
         const fileInput = document.getElementById("file");
         const fileName = document.getElementById("file-name");
-        const submitButton = document.getElementById("submit-button");
-        const uploadForm = document.getElementById("upload-form");
+        const uploadStatus = document.getElementById("upload-status");
 
         const manualForm = document.getElementById("manual-form");
         const manualPayloadInput = document.getElementById("manual-payload");
         const manualSubmitButton = document.getElementById("manual-submit-button");
-        const manualFilenameInput = document.getElementById("manual-filename");
+        const rangeStartInput = document.getElementById("range-start");
+        const rangeEndInput = document.getElementById("range-end");
+        const generateRangeButton = document.getElementById("generate-range-button");
         const addDateButton = document.getElementById("add-date-button");
+        const clearDatesButton = document.getElementById("clear-dates-button");
         const addRowButton = document.getElementById("add-row-button");
         const manualDateList = document.getElementById("manual-date-list");
+        const manualTableWrap = document.getElementById("manual-table-wrap");
         const manualTableBody = document.getElementById("manual-table-body");
+        const manualHistoryStatus = document.getElementById("manual-history-status");
+        const historyStack = document.getElementById("history-stack");
+        const historyEmptyState = document.getElementById("history-empty-state");
+        const loadSubmissionButtons = Array.from(document.querySelectorAll("[data-load-submission]"));
+        const deleteSubmissionButtons = Array.from(document.querySelectorAll("[data-delete-submission]"));
 
-        const categoryOptions = ["ISG", "Kalite", "Uretim", "Planlama"];
+        const categoryOptions = {{ template_categories|tojson }};
+        const parameterOptionsByCategory = {{ template_parameters|tojson }};
         let manualDateCounter = 0;
         let manualRowCounter = 0;
+        let manualDragState = null;
 
         function formatDateLabel(value) {
             if (!value) return "Tarih sec";
@@ -142,7 +204,7 @@
 
         function getDateEntries() {
             return Array.from(manualDateList.querySelectorAll("[data-date-item]")).map((item) => {
-                const input = item.querySelector("input");
+                const input = item.querySelector("[data-date-value]");
                 return {
                     id: item.dataset.dateId,
                     value: input ? input.value : "",
@@ -158,14 +220,29 @@
             return values;
         }
 
-        function updateDateLabels() {
-            manualDateList.querySelectorAll("[data-date-item]").forEach((item) => {
-                const input = item.querySelector("input");
-                const label = item.querySelector("[data-date-label]");
-                if (label) {
-                    label.textContent = formatDateLabel(input ? input.value : "");
-                }
-            });
+        function setInlineStatus(element, message = "", tone = "info") {
+            if (!element) return;
+            element.hidden = !message;
+            element.textContent = message;
+            element.classList.toggle("manual-hint--success", tone === "success");
+            element.classList.toggle("manual-hint--warning", tone === "warning");
+        }
+
+        function setHistoryStatus(message = "", tone = "info") {
+            setInlineStatus(manualHistoryStatus, message, tone);
+        }
+
+        function setUploadStatus(message = "", tone = "info") {
+            setInlineStatus(uploadStatus, message, tone);
+        }
+
+        function syncHistoryEmptyState() {
+            if (!historyStack || !historyEmptyState) return;
+            historyEmptyState.hidden = historyStack.children.length > 0;
+        }
+
+        function isInteractiveTableTarget(target) {
+            return Boolean(target.closest("input, select, button, option, label"));
         }
 
         function renderRowDateCells(row) {
@@ -210,21 +287,69 @@
                 dateEntries.forEach((entry) => {
                     const headCell = document.createElement("th");
                     headCell.className = "manual-date-head";
-                    headCell.textContent = formatDateLabel(entry.value);
+
+                    const headContent = document.createElement("div");
+                    headContent.className = "manual-date-head-content";
+
+                    const headLabel = document.createElement("span");
+                    headLabel.className = "manual-date-head-label";
+                    headLabel.textContent = formatDateLabel(entry.value);
+
+                    const removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.className = "icon-button icon-button--chip manual-date-head-remove";
+                    removeButton.textContent = "x";
+                    removeButton.setAttribute("aria-label", `${formatDateLabel(entry.value)} tarihini sil`);
+                    removeButton.addEventListener("click", () => {
+                        removeDateItemById(entry.id);
+                    });
+
+                    headContent.append(headLabel, removeButton);
+                    headCell.appendChild(headContent);
                     headRow.insertBefore(headCell, actionHead);
                 });
             }
         }
 
         function refreshManualTable() {
-            updateDateLabels();
             renderTableHeader();
             Array.from(manualTableBody.querySelectorAll("[data-row-item]")).forEach((row) => {
                 renderRowDateCells(row);
             });
         }
 
+        function clearDateItems() {
+            manualDateList.innerHTML = "";
+        }
+
+        function removeDateItemById(dateId) {
+            const target = manualDateList.querySelector(`[data-date-item][data-date-id='${dateId}']`);
+            if (!target) return;
+            target.remove();
+            refreshManualTable();
+        }
+
+        function clearManualRows() {
+            manualTableBody.innerHTML = "";
+        }
+
+        function appendMissingOption(select, value) {
+            if (!select || !value) return;
+            const hasOption = Array.from(select.options).some((option) => option.value === value);
+            if (hasOption) return;
+
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            select.appendChild(option);
+        }
+
         function createDateItem(value = "") {
+            if (!value) return;
+
+            const existing = getDateEntries().some((entry) => entry.value === value);
+            if (existing) return;
+
             manualDateCounter += 1;
 
             const wrapper = document.createElement("div");
@@ -232,32 +357,56 @@
             wrapper.dataset.dateItem = "true";
             wrapper.dataset.dateId = `date-${manualDateCounter}`;
 
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.value = value;
+            hiddenInput.dataset.dateValue = "true";
+
             const label = document.createElement("span");
             label.className = "manual-date-label";
             label.dataset.dateLabel = "true";
             label.textContent = formatDateLabel(value);
 
-            const input = document.createElement("input");
-            input.type = "date";
-            input.className = "field-input";
-            input.value = value;
-
             const removeButton = document.createElement("button");
             removeButton.type = "button";
-            removeButton.className = "icon-button";
-            removeButton.textContent = "Sil";
+            removeButton.className = "icon-button icon-button--chip";
+            removeButton.textContent = "x";
 
             removeButton.addEventListener("click", () => {
-                wrapper.remove();
-                refreshManualTable();
+                removeDateItemById(wrapper.dataset.dateId);
             });
 
-            input.addEventListener("input", refreshManualTable);
-            input.addEventListener("change", refreshManualTable);
-
-            wrapper.append(label, input, removeButton);
+            wrapper.append(hiddenInput, label, removeButton);
             manualDateList.appendChild(wrapper);
             refreshManualTable();
+        }
+
+        function createDateRange(startValue, endValue) {
+            if (!startValue || !endValue) {
+                window.alert("Aralik olusturmak icin baslangic ve bitis tarihi secmelisin.");
+                return;
+            }
+
+            const start = new Date(`${startValue}T00:00:00`);
+            const end = new Date(`${endValue}T00:00:00`);
+
+            if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+                window.alert("Gecerli bir tarih araligi sec.");
+                return;
+            }
+
+            if (start > end) {
+                window.alert("Baslangic tarihi bitis tarihinden sonra olamaz.");
+                return;
+            }
+
+            clearDateItems();
+
+            const cursor = new Date(start);
+            while (cursor <= end) {
+                createDateItem(toDateInputValue(cursor));
+                cursor.setDate(cursor.getDate() + 1);
+            }
         }
 
         function createCategorySelect(selectedValue = "") {
@@ -280,7 +429,44 @@
                 select.appendChild(option);
             });
 
+            appendMissingOption(select, selectedValue);
+            if (selectedValue) {
+                select.value = selectedValue;
+            }
+
             return select;
+        }
+
+        function createParameterSelect() {
+            const select = document.createElement("select");
+            select.className = "field-input field-input--table";
+            select.dataset.field = "parameter";
+            return select;
+        }
+
+        function fillParameterOptions(select, category, selectedValue = "") {
+            select.innerHTML = "";
+
+            const emptyOption = document.createElement("option");
+            emptyOption.value = "";
+            emptyOption.textContent = category ? "Parametre sec" : "Once kategori sec";
+            select.appendChild(emptyOption);
+
+            const options = parameterOptionsByCategory[category] || [];
+            options.forEach((optionValue) => {
+                const option = document.createElement("option");
+                option.value = optionValue;
+                option.textContent = optionValue;
+                if (optionValue === selectedValue) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            appendMissingOption(select, selectedValue);
+            if (selectedValue) {
+                select.value = selectedValue;
+            }
         }
 
         function createRow(defaults = {}) {
@@ -291,17 +477,14 @@
             row.dataset.rowId = `row-${manualRowCounter}`;
 
             const categoryCell = document.createElement("td");
-            categoryCell.appendChild(createCategorySelect(defaults.category || ""));
+            const categorySelect = createCategorySelect(defaults.category || "");
+            categoryCell.appendChild(categorySelect);
 
             const parameterCell = document.createElement("td");
-            const parameterInput = document.createElement("input");
-            parameterInput.type = "text";
-            parameterInput.className = "field-input field-input--table";
-            parameterInput.placeholder = "Orn. Bronz Hurda %";
-            parameterInput.value = defaults.parameter || "";
-            parameterInput.dataset.field = "parameter";
-            parameterInput.addEventListener("input", () => renderRowDateCells(row));
-            parameterCell.appendChild(parameterInput);
+            const parameterSelect = createParameterSelect();
+            fillParameterOptions(parameterSelect, defaults.category || "", defaults.parameter || "");
+            parameterSelect.addEventListener("change", () => renderRowDateCells(row));
+            parameterCell.appendChild(parameterSelect);
 
             const actionCell = document.createElement("td");
             actionCell.className = "manual-action-cell";
@@ -313,9 +496,30 @@
             removeButton.addEventListener("click", () => row.remove());
             actionCell.appendChild(removeButton);
 
+            categorySelect.addEventListener("change", () => {
+                fillParameterOptions(parameterSelect, categorySelect.value, "");
+                renderRowDateCells(row);
+            });
+
             row.append(categoryCell, parameterCell, actionCell);
             manualTableBody.appendChild(row);
             renderRowDateCells(row);
+
+            if (defaults.values) {
+                applyValuesToRow(row, defaults.values);
+            }
+        }
+
+        function applyValuesToRow(row, values = {}) {
+            const dateEntryMap = new Map(getDateEntries().map((entry) => [entry.value, entry.id]));
+            Object.entries(values).forEach(([dateValue, fieldValue]) => {
+                const dateId = dateEntryMap.get(dateValue);
+                if (!dateId) return;
+                const input = row.querySelector(`[data-date-id='${dateId}']`);
+                if (input) {
+                    input.value = fieldValue ?? "";
+                }
+            });
         }
 
         function getManualRows() {
@@ -336,6 +540,15 @@
                     values,
                 };
             });
+        }
+
+        function hasManualFormContent() {
+            const hasDates = getDateEntries().some((entry) => entry.value);
+            const hasRows = getManualRows().some((row) => {
+                const hasValues = Object.values(row.values).some((value) => String(value || "").trim());
+                return row.category || row.parameter || hasValues;
+            });
+            return hasDates || hasRows;
         }
 
         function validateManualForm() {
@@ -366,18 +579,124 @@
             return true;
         }
 
-        fileInput.addEventListener("change", () => {
-            const selected = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "Henuz dosya secilmedi.";
-            fileName.textContent = selected;
+        function populateManualFormFromPayload(payload, submissionName = "", showHistoryMessage = true) {
+            const dates = Array.isArray(payload.dates) ? payload.dates.filter(Boolean) : [];
+            const rows = Array.isArray(payload.rows) ? payload.rows : [];
+
+            clearDateItems();
+            clearManualRows();
+
+            if (dates.length) {
+                rangeStartInput.value = dates[0];
+                rangeEndInput.value = dates[dates.length - 1];
+                dates.forEach((dateValue) => createDateItem(dateValue));
+            } else {
+                rangeStartInput.value = "";
+                rangeEndInput.value = "";
+                refreshManualTable();
+            }
+
+            rows.forEach((row) => {
+                createRow({
+                    category: row.category || "",
+                    parameter: row.parameter || "",
+                    values: row.values || {},
+                });
+            });
+
+            if (!rows.length) {
+                createRow({});
+            }
+
+            refreshManualTable();
+            if (showHistoryMessage) {
+                setHistoryStatus(`${submissionName || "Kayit"} forma yuklendi. Duzenleyip yeniden analiz edebilirsin.`, "success");
+            }
+            manualForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        fileInput.addEventListener("change", async () => {
+            const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+            fileName.textContent = selectedFile ? selectedFile.name : "Henuz dosya secilmedi.";
+
+            if (!selectedFile) {
+                setUploadStatus("Bir Excel sectiginde veri satirlari bolumu otomatik dolar.");
+                return;
+            }
+
+            if (hasManualFormContent()) {
+                const shouldReplace = window.confirm("Mevcut manuel veriler temizlenecek ve secilen Excel dosyasindaki verilerle degistirilecek. Devam edilsin mi?");
+                if (!shouldReplace) {
+                    fileInput.value = "";
+                    fileName.textContent = "Henuz dosya secilmedi.";
+                    setUploadStatus("Excel aktarma iptal edildi.");
+                    return;
+                }
+            }
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            fileInput.disabled = true;
+            setUploadStatus("Excel okunuyor ve forma aktariliyor...");
+            setHistoryStatus("");
+
+            try {
+                const response = await fetch("/prefill-excel", {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.ok || !data.payload) {
+                    throw new Error(data.message || "Excel forma aktarilamadi.");
+                }
+
+                populateManualFormFromPayload(data.payload, data.source_name || selectedFile.name, false);
+                setUploadStatus(`${data.source_name || selectedFile.name} veri satirlarina aktarıldi. Dilersen duzenleyip analiz edebilirsin.`, "success");
+            } catch (error) {
+                setUploadStatus(error.message || "Excel forma aktarilamadi.", "warning");
+            } finally {
+                fileInput.disabled = false;
+                fileInput.value = "";
+            }
         });
 
-        uploadForm.addEventListener("submit", () => {
-            submitButton.disabled = true;
-            submitButton.textContent = "Analiz hazirlaniyor...";
+        generateRangeButton.addEventListener("click", () => {
+            createDateRange(rangeStartInput.value, rangeEndInput.value);
         });
 
-        addDateButton.addEventListener("click", () => createDateItem(""));
-        addRowButton.addEventListener("click", () => createRow({}));
+        addDateButton.addEventListener("click", () => {
+            const dateEntries = getDateEntries();
+            if (!dateEntries.length) {
+                if (rangeEndInput.value) {
+                    createDateItem(rangeEndInput.value);
+                } else {
+                    window.alert("Once tarih araligini olustur ya da bitis tarihi sec.");
+                }
+                return;
+            }
+
+            const lastDate = dateEntries[dateEntries.length - 1].value;
+            const nextDate = new Date(`${lastDate}T00:00:00`);
+            nextDate.setDate(nextDate.getDate() + 1);
+            const nextValue = toDateInputValue(nextDate);
+            createDateItem(nextValue);
+            rangeEndInput.value = nextValue;
+        });
+
+        clearDatesButton.addEventListener("click", () => {
+            clearDateItems();
+            refreshManualTable();
+            setHistoryStatus("");
+            setUploadStatus("");
+        });
+
+        addRowButton.addEventListener("click", () => {
+            createRow({});
+            setHistoryStatus("");
+            setUploadStatus("");
+        });
 
         manualForm.addEventListener("submit", (event) => {
             if (!validateManualForm()) {
@@ -386,22 +705,129 @@
             }
 
             manualPayloadInput.value = JSON.stringify({
-                filename: manualFilenameInput.value.trim(),
                 dates: getDateEntries().map((entry) => entry.value),
                 rows: getManualRows(),
             });
 
             manualSubmitButton.disabled = true;
-            manualSubmitButton.textContent = "Excel olusturuluyor...";
+            manualSubmitButton.textContent = "Analiz hazirlaniyor...";
         });
+
+        loadSubmissionButtons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                const submissionId = button.dataset.loadSubmission;
+                if (!submissionId) return;
+
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = "Yukleniyor...";
+                setHistoryStatus("");
+
+                try {
+                    const response = await fetch(`/manual-submissions/${submissionId}`);
+                    const data = await response.json();
+                    if (!response.ok || !data.ok || !data.record) {
+                        throw new Error(data.message || "Kayit yuklenemedi.");
+                    }
+
+                    populateManualFormFromPayload(
+                        data.record.payload || {},
+                        data.record.display_name || "Kayit",
+                    );
+                } catch (error) {
+                    setHistoryStatus(error.message || "Kayit yuklenemedi.", "warning");
+                } finally {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            });
+        });
+
+        deleteSubmissionButtons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                const submissionId = button.dataset.deleteSubmission;
+                const displayName = button.dataset.displayName || "Bu kayit";
+                if (!submissionId) return;
+
+                const shouldDelete = window.confirm(`${displayName} kaydini veri tabanindan silmek istedigine emin misin?`);
+                if (!shouldDelete) {
+                    return;
+                }
+
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = "Siliniyor...";
+                setHistoryStatus("");
+
+                try {
+                    const response = await fetch(`/manual-submissions/${submissionId}`, {
+                        method: "DELETE",
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data.ok) {
+                        throw new Error(data.message || "Kayit silinemedi.");
+                    }
+
+                    const item = document.querySelector(`[data-history-item='${submissionId}']`);
+                    if (item) {
+                        item.remove();
+                    }
+                    syncHistoryEmptyState();
+                    setHistoryStatus(`${displayName} kaydi silindi.`, "success");
+                } catch (error) {
+                    setHistoryStatus(error.message || "Kayit silinemedi.", "warning");
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    return;
+                }
+            });
+        });
+
+        if (manualTableWrap) {
+            manualTableWrap.addEventListener("mousedown", (event) => {
+                if (event.button !== 0 || isInteractiveTableTarget(event.target)) {
+                    return;
+                }
+
+                manualDragState = {
+                    startX: event.clientX,
+                    startY: event.clientY,
+                    scrollLeft: manualTableWrap.scrollLeft,
+                    scrollTop: manualTableWrap.scrollTop,
+                };
+                manualTableWrap.classList.add("is-grabbing");
+                event.preventDefault();
+            });
+
+            window.addEventListener("mousemove", (event) => {
+                if (!manualDragState) {
+                    return;
+                }
+
+                const deltaX = event.clientX - manualDragState.startX;
+                const deltaY = event.clientY - manualDragState.startY;
+                manualTableWrap.scrollLeft = manualDragState.scrollLeft - deltaX;
+                manualTableWrap.scrollTop = manualDragState.scrollTop - deltaY;
+            });
+
+            window.addEventListener("mouseup", () => {
+                if (!manualDragState) {
+                    return;
+                }
+                manualDragState = null;
+                manualTableWrap.classList.remove("is-grabbing");
+            });
+        }
 
         const today = new Date();
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
 
-        createDateItem(toDateInputValue(yesterday));
-        createDateItem(toDateInputValue(today));
+        rangeStartInput.value = toDateInputValue(yesterday);
+        rangeEndInput.value = toDateInputValue(today);
+        createDateRange(rangeStartInput.value, rangeEndInput.value);
         createRow({});
         refreshManualTable();
+        syncHistoryEmptyState();
     </script>
 {% endblock %}

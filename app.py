@@ -2,16 +2,22 @@ import json
 import os
 import re
 from html import escape
-from datetime import date, datetime
+from datetime import date
+from glob import glob
 
 import pandas as pd
-from flask import Flask, render_template, request
-from flask import abort, send_from_directory
+from flask import Flask, jsonify, render_template, request
 from openpyxl import load_workbook
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
 from analysis_engine import analyze_excel_file, analyze_raw_dataframe, infer_unit
+from manual_entry_store import (
+    delete_manual_submission,
+    get_manual_submission_payload,
+    list_recent_manual_submissions,
+    save_manual_submission,
+)
 from ollama_client import (
     ask_ollama,
     build_fallback_comment,
@@ -24,6 +30,11 @@ load_dotenv()
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+MANUAL_TEMPLATE_PATTERNS = [
+    r"C:\Users\bt.stajyer\OneDrive - Dikkan Gemi ve Endustriyel Vana Sanayi Ticaret A.S\Masa*\ahsen\Sabah Top*.xlsx",
+    os.path.join(os.path.dirname(__file__), "uploads", "Sabah*.xlsx"),
+]
 
 
 TR_MONTHS = {
@@ -135,6 +146,59 @@ def render_ai_comment_html(text):
     return "".join(parts)
 
 
+def find_manual_template_path():
+    for pattern in MANUAL_TEMPLATE_PATTERNS:
+        matches = sorted(glob(pattern))
+        if matches:
+            return matches[0]
+    return None
+
+
+def load_manual_template_config():
+    template_path = find_manual_template_path()
+    config = {
+        "path": template_path,
+        "categories": [],
+        "parameters_by_category": {},
+        "row_index_map": {},
+        "date_column_count": 0,
+    }
+
+    if not template_path:
+        return config
+
+    workbook = load_workbook(template_path, data_only=False)
+    worksheet = workbook["Veriler"]
+    config["date_column_count"] = max(0, worksheet.max_column - 2)
+
+    categories = []
+    parameters_by_category = {}
+    row_index_map = {}
+
+    for row_index in range(2, worksheet.max_row + 1):
+        category = worksheet.cell(row=row_index, column=1).value
+        parameter = worksheet.cell(row=row_index, column=2).value
+        if not category or not parameter:
+            continue
+
+        category_text = str(category).strip()
+        parameter_text = str(parameter).strip()
+
+        if category_text not in categories:
+            categories.append(category_text)
+        parameters_by_category.setdefault(category_text, []).append(parameter_text)
+        row_index_map[(category_text, parameter_text)] = row_index
+
+    workbook.close()
+    config["categories"] = categories
+    config["parameters_by_category"] = parameters_by_category
+    config["row_index_map"] = row_index_map
+    return config
+
+
+MANUAL_TEMPLATE_CONFIG = load_manual_template_config()
+
+
 def normalize_manual_number(value, parametre=None):
     if value is None:
         return None
@@ -163,6 +227,86 @@ def normalize_manual_number(value, parametre=None):
     return numeric_value
 
 
+def build_manual_submission_name(date_keys):
+    if not date_keys:
+        return "manuel_giris"
+
+    start_key = str(date_keys[0])
+    end_key = str(date_keys[-1])
+    if start_key == end_key:
+        return f"manuel_giris_{start_key}"
+    return f"manuel_giris_{start_key}_{end_key}"
+
+
+def format_manual_prefill_value(value, parametre=None):
+    if value is None or pd.isna(value):
+        return None
+
+    numeric_value = pd.to_numeric(value, errors="coerce")
+    if pd.isna(numeric_value):
+        text = str(value).strip()
+        return text or None
+
+    normalized_value = float(numeric_value)
+    if infer_unit(parametre) == "%":
+        normalized_value *= 100
+
+    if abs(normalized_value - round(normalized_value)) < 1e-9:
+        return str(int(round(normalized_value)))
+    return f"{normalized_value:.2f}".rstrip("0").rstrip(".")
+
+
+def build_manual_payload_from_excel(file_obj):
+    raw_df = pd.read_excel(file_obj, sheet_name="Veriler")
+    raw_df.columns = [str(col).strip() if not isinstance(col, pd.Timestamp) else col for col in raw_df.columns]
+
+    if "Kategori" not in raw_df.columns or "Parametre" not in raw_df.columns:
+        raise ValueError("Veriler sayfasinda 'Kategori' ve 'Parametre' sutunlari bulunamadi.")
+
+    date_columns = []
+    for col in raw_df.columns:
+        if col in {"Kategori", "Parametre"}:
+            continue
+        parsed = pd.to_datetime(col, errors="coerce")
+        if not pd.isna(parsed):
+            date_columns.append((col, pd.Timestamp(parsed).normalize().date().isoformat()))
+
+    if not date_columns:
+        raise ValueError("Excel icinde veri satirlarini dolduracak tarih kolonu bulunamadi.")
+
+    rows = []
+    for _, row in raw_df.iterrows():
+        category = str(row.get("Kategori") or "").strip()
+        parameter = str(row.get("Parametre") or "").strip()
+        if not category or not parameter:
+            continue
+
+        values = {}
+        for source_column, date_key in date_columns:
+            formatted_value = format_manual_prefill_value(row.get(source_column), parameter)
+            if formatted_value is not None:
+                values[date_key] = formatted_value
+
+        if not values:
+            continue
+
+        rows.append(
+            {
+                "category": category,
+                "parameter": parameter,
+                "values": values,
+            }
+        )
+
+    if not rows:
+        raise ValueError("Excel icinde forma aktarilacak dolu veri satiri bulunamadi.")
+
+    return {
+        "dates": [date_key for _, date_key in date_columns],
+        "rows": rows,
+    }
+
+
 def build_manual_dataframe(payload_text):
     try:
         payload = json.loads(payload_text)
@@ -171,7 +315,6 @@ def build_manual_dataframe(payload_text):
 
     date_values = payload.get("dates") or []
     rows = payload.get("rows") or []
-    preferred_name = secure_filename(str(payload.get("filename") or "").strip())
 
     if not isinstance(date_values, list) or not isinstance(rows, list):
         raise ValueError("Manuel giris verisi beklenen formatta degil.")
@@ -195,6 +338,8 @@ def build_manual_dataframe(payload_text):
     if not normalized_date_keys:
         raise ValueError("En az bir tarih girilmeli.")
 
+    allowed_pairs = set(MANUAL_TEMPLATE_CONFIG["row_index_map"].keys())
+    seen_pairs = set()
     records = []
     for row_index, row in enumerate(rows, start=1):
         if not isinstance(row, dict):
@@ -213,6 +358,14 @@ def build_manual_dataframe(payload_text):
         if not category or not parameter:
             raise ValueError(f"{row_index}. satirda kategori ve parametre zorunlu.")
 
+        if allowed_pairs and (category, parameter) not in allowed_pairs:
+            raise ValueError(f"{row_index}. satirdaki kategori / parametre sablonla uyusmuyor.")
+
+        pair_key = (category, parameter)
+        if pair_key in seen_pairs:
+            raise ValueError(f"{row_index}. satirda ayni kategori / parametre ikinci kez kullanildi.")
+        seen_pairs.add(pair_key)
+
         record = {"Kategori": category, "Parametre": parameter}
         filled_value_count = 0
 
@@ -230,58 +383,9 @@ def build_manual_dataframe(payload_text):
     if not records:
         raise ValueError("Analiz icin en az bir dolu satir gerekiyor.")
 
-    return pd.DataFrame(records), preferred_name
+    return pd.DataFrame(records), build_manual_submission_name(normalized_date_keys)
 
-
-def create_generated_excel(raw_df, preferred_name=None):
-    base_name = preferred_name or f"manuel_giris_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    filename = base_name if base_name.lower().endswith(".xlsx") else f"{base_name}.xlsx"
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-
-    duplicate_index = 1
-    while os.path.exists(filepath):
-        stem = filename[:-5] if filename.lower().endswith(".xlsx") else filename
-        filename = f"{stem}_{duplicate_index}.xlsx"
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        duplicate_index += 1
-
-    export_df = raw_df.copy()
-    renamed_columns = []
-    for column in export_df.columns:
-        if column in {"Kategori", "Parametre"}:
-            renamed_columns.append(column)
-            continue
-
-        parsed = pd.to_datetime(column, errors="coerce")
-        renamed_columns.append(parsed.to_pydatetime() if not pd.isna(parsed) else column)
-
-    export_df.columns = renamed_columns
-    export_df.to_excel(filepath, sheet_name="Veriler", index=False)
-
-    workbook = load_workbook(filepath)
-    worksheet = workbook["Veriler"]
-
-    for column_index in range(3, worksheet.max_column + 1):
-        worksheet.cell(row=1, column=column_index).number_format = "dd.mm.yyyy"
-
-    for row_index in range(2, worksheet.max_row + 1):
-        unit = infer_unit(worksheet.cell(row=row_index, column=2).value)
-        if unit == "%":
-            number_format = "0.0%"
-        else:
-            number_format = "#,##0.##"
-
-        for column_index in range(3, worksheet.max_column + 1):
-            cell = worksheet.cell(row=row_index, column=column_index)
-            if cell.value is not None:
-                cell.number_format = number_format
-
-    workbook.save(filepath)
-    workbook.close()
-    return filename, filepath
-
-
-def render_analysis_result(result, source_name=None, source_kind="Excel yukleme", generated_filename=None):
+def render_analysis_result(result, source_name=None, source_kind="Excel yukleme", persistence_result=None):
     report_today = date.today()
     success_count = len([item for item in result["actions"] if item["status"] == "success"])
     critical_count = len([item for item in result["actions"] if item["status"] == "danger"])
@@ -315,13 +419,70 @@ def render_analysis_result(result, source_name=None, source_kind="Excel yukleme"
         critical_count=critical_count,
         source_name=source_name,
         source_kind=source_kind,
-        generated_filename=generated_filename,
+        persistence_result=persistence_result,
     )
 
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("index.html")
+    history_result = list_recent_manual_submissions(limit=8)
+    return render_template(
+        "index.html",
+        template_categories=MANUAL_TEMPLATE_CONFIG["categories"],
+        template_parameters=MANUAL_TEMPLATE_CONFIG["parameters_by_category"],
+        template_name=os.path.basename(MANUAL_TEMPLATE_CONFIG["path"]) if MANUAL_TEMPLATE_CONFIG["path"] else None,
+        manual_history=history_result.get("records", []),
+        manual_history_error=None if history_result.get("ok") else history_result.get("message"),
+    )
+
+
+@app.route("/help", methods=["GET"])
+def help_page():
+    return render_template("help.html")
+
+
+@app.route("/prefill-excel", methods=["POST"])
+def prefill_excel():
+    if "file" not in request.files:
+        return jsonify({"ok": False, "message": "Once bir Excel dosyasi sec."}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"ok": False, "message": "Dosya secilmedi."}), 400
+
+    try:
+        file.stream.seek(0)
+        payload = build_manual_payload_from_excel(file)
+        return jsonify(
+            {
+                "ok": True,
+                "source_name": secure_filename(file.filename),
+                "payload": payload,
+            }
+        )
+    except Exception as exc:
+        return jsonify(
+            {
+                "ok": False,
+                "message": str(exc),
+            }
+        ), 400
+
+
+@app.route("/manual-submissions/<submission_id>", methods=["GET", "DELETE"])
+def get_manual_submission(submission_id):
+    if request.method == "DELETE":
+        result = delete_manual_submission(submission_id)
+        if not result.get("ok"):
+            status_code = 404 if result.get("message") == "Kayit bulunamadi." else 400
+            return jsonify({"ok": False, "message": result.get("message")}), status_code
+        return jsonify(result)
+
+    result = get_manual_submission_payload(submission_id)
+    if not result.get("ok"):
+        status_code = 404 if result.get("message") == "Kayit bulunamadi." else 400
+        return jsonify({"ok": False, "message": result.get("message")}), status_code
+    return jsonify(result)
 
 
 @app.route("/analyze", methods=["POST"])
@@ -373,13 +534,19 @@ def analyze_manual():
 
     try:
         raw_df, preferred_name = build_manual_dataframe(payload_text)
-        generated_filename, _ = create_generated_excel(raw_df, preferred_name)
         result = analyze_raw_dataframe(raw_df)
+        persistence_result = save_manual_submission(
+            raw_df,
+            payload_text,
+            submission_name=preferred_name or "manuel_giris",
+            template_name=os.path.basename(MANUAL_TEMPLATE_CONFIG["path"]) if MANUAL_TEMPLATE_CONFIG["path"] else None,
+            result=result,
+        )
         return render_analysis_result(
             result,
-            source_name=generated_filename,
+            source_name=preferred_name or "manuel_giris",
             source_kind="Manuel giris",
-            generated_filename=generated_filename,
+            persistence_result=persistence_result,
         )
     except ValueError as exc:
         return render_template(
@@ -395,15 +562,6 @@ def analyze_manual():
             message="Veriler kaydedildi ancak analiz asamasinda bir sorun olustu.",
             detail=str(exc),
         ), 500
-
-
-@app.route("/downloads/<path:filename>", methods=["GET"])
-def download_file(filename):
-    safe_filename = secure_filename(filename)
-    if safe_filename != filename:
-        abort(404)
-
-    return send_from_directory(app.config["UPLOAD_FOLDER"], safe_filename, as_attachment=True)
 
 
 if __name__ == "__main__":

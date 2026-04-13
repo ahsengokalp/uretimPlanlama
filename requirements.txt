@@ -4,3 +4,4 @@ openpyxl
 python-dotenv
 requests
 plotly
+psycopg[binary]

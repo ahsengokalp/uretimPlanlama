@@ -4,9 +4,6 @@
 {% block topbar_title %}Toplanti Sonuclari{% endblock %}
 
 {% block top_actions %}
-    {% if generated_filename %}
-        <a class="nav-chip nav-chip--solid" href="{{ url_for('download_file', filename=generated_filename) }}">Olusan Exceli indir</a>
-    {% endif %}
     <a class="nav-chip nav-chip--solid" href="/">Yeni Dosya</a>
 {% endblock %}
 
@@ -148,13 +145,19 @@
                             <span>Trend</span>
                             <strong>{{ charts|length }}</strong>
                         </div>
-                        <div class="summary-box">
-                            <span>AI</span>
-                            <strong>{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
-                        </div>
+                    <div class="summary-box">
+                        <span>AI</span>
+                        <strong>{% if ai_comment %}Hazir{% else %}Yok{% endif %}</strong>
                     </div>
-                    {% if generated_filename %}
-                        <div class="notice-panel notice-panel--ai">Bu rapor manuel giristen uretildi. Istersen ayni yapidaki Excel dosyasini indirip tekrar kullanabilirsin.</div>
+                </div>
+                    {% if persistence_result %}
+                        <div class="notice-panel {% if persistence_result.ok %}notice-panel--ai{% else %}notice-panel--warning{% endif %}">
+                            {{ persistence_result.message }}
+                            {% if persistence_result.submission_id %}
+                                <br>
+                                Kayit ID: {{ persistence_result.submission_id }}
+                            {% endif %}
+                        </div>
                     {% endif %}
                     <div class="notice-panel accent-panel">{{ info_text }}</div>
                 </div>

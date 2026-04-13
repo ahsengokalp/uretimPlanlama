@@ -20,6 +20,12 @@
             {% block top_actions %}
                 <a class="nav-chip nav-chip--solid" href="/">Ana Panel</a>
             {% endblock %}
+            <a
+                class="nav-chip nav-chip--icon {% if request.endpoint == 'help_page' %}is-active{% endif %}"
+                href="{{ url_for('help_page') }}"
+                aria-label="Yardim"
+                title="Yardim"
+            >?</a>
         </nav>
     </header>
 

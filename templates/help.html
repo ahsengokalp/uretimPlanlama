@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Yardim{% endblock %}
+{% block topbar_title %}Uygulama Yardimi{% endblock %}
+
+{% block top_actions %}
+    <a class="nav-chip nav-chip--solid" href="/">Ana Panel</a>
+{% endblock %}
+
+{% block content %}
+    <section class="help-shell">
+        <article class="help-hero">
+            <span class="landing-kicker">Yardim</span>
+            <h1>Uygulamayi nasil kullanirsin?</h1>
+            <p>Bu ekran, sabah toplantisi icin veriyi en hizli sekilde nasil hazirlayabilecegini adim adim anlatir. Teknik detay yerine ekranda ne yapman gerektigine odaklanir.</p>
+        </article>
+
+        <section class="help-grid">
+            <article class="help-card">
+                <h2>1. En hizli baslangic</h2>
+                <ul class="help-list">
+                    <li>Hazir bir Excel dosyan varsa ustteki <strong>Excel dosyasini sec</strong> butonunu kullan.</li>
+                    <li>Excelin yoksa dogrudan alttaki manuel giris alanindan devam et.</li>
+                    <li>Her iki durumda da son adim aynidir: formu kontrol edip <strong>Analiz et ve kaydet</strong> butonuna basarsin.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>2. Excel ile calisma</h2>
+                <ul class="help-list">
+                    <li>Dosyani sectiginde sistem verileri otomatik olarak alttaki tabloya aktarir.</li>
+                    <li>Tarihler ustteki tarih alanina, satirlar ise <strong>Veri satirlari</strong> bolumune dolar.</li>
+                    <li>Aktarma sonrasinda istersen hucreleri tek tek duzenleyebilir, satir ekleyebilir veya gereksiz tarihleri silebilirsin.</li>
+                    <li>Excel sadece baslangic noktasi gibi dusunulmeli; asil kontrol edecegin yer ekrandaki veri tablosudur.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>3. Manuel veri girisi</h2>
+                <ul class="help-list">
+                    <li>Once <strong>Baslangic</strong> ve <strong>Bitis</strong> tarihini sec, sonra <strong>Araligi olustur</strong> butonuna bas.</li>
+                    <li>Ek bir gun lazimsa <strong>Sonraki gunu ekle</strong> kullanabilirsin.</li>
+                    <li><strong>Satir ekle</strong> ile yeni kategori ve parametre acilir.</li>
+                    <li>Degerleri tarih kolonlarina girersin; yuzde tipindeki alanlarda `4` yazarsan sistem bunu `%4` gibi yorumlar.</li>
+                    <li>Tabloyu aylik veri girecek sekilde kullanabilir, yatay kaydirarak tum gunleri gorebilirsin.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>4. Kayitli verileri yeniden kullanma</h2>
+                <ul class="help-list">
+                    <li>Ana ekrandaki <strong>Kayitli veri setleri</strong> bolumunde onceki girislerini gorebilirsin.</li>
+                    <li><strong>Forma yukle</strong> dediginde eski kayit tabloya geri gelir.</li>
+                    <li>Bunu aynen tekrar kullanabilir ya da uzerinde degisiklik yapip yeniden kaydedebilirsin.</li>
+                    <li>Artik ihtiyacin olmayan eski kayitlari ayni bolumdeki <strong>Sil</strong> butonuyla kaldirabilirsin.</li>
+                    <li>Bu ozellik ozellikle her ay benzer yapiyla veri girerken zamani kisaltir.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>5. Son adim: analiz ve kayit</h2>
+                <ul class="help-list">
+                    <li>Verileri gozden gecirdikten sonra <strong>Analiz et ve kaydet</strong> butonuna bas.</li>
+                    <li>Sonuc ekraninda genel ozet, dikkat isteyen noktalar ve grafikler gorursun.</li>
+                    <li>Kayit basariyla tamamlandiysa ekranda bir onay bilgisi yer alir.</li>
+                    <li>Sonradan ayni veriyi tekrar acmak istersen ana ekrandaki kayitli veri setlerinden devam edebilirsin.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>6. Sonuc ekraninda neye bakmali?</h2>
+                <ul class="help-list">
+                    <li><strong>Genel ozet</strong> kartlari, kac kritik ve kac olumlu durum oldugunu hizlica gosterir.</li>
+                    <li><strong>Cikarimlar</strong> bolumu, toplantida once hangi konularin konusulmasi gerektigini one cikarir.</li>
+                    <li><strong>Grafikler</strong> ile parametrelerin gun gun nasil degistigini gorebilirsin.</li>
+                    <li>Bu ekran, toplantida okunacak kisa bir ozet gibi dusunulebilir.</li>
+                </ul>
+            </article>
+
+            <article class="help-card">
+                <h2>7. Pratik ipuclari</h2>
+                <ul class="help-list">
+                    <li>Ayni satiri iki kez acmak yerine mevcut satiri guncellemek daha temiz sonuc verir.</li>
+                    <li>Analize gecmeden once tarihlerin dogru sirada ve eksiksiz oldugunu kontrol et.</li>
+                    <li>Excelden veri aktardiysan, aktarma sonrasi tabloyu gozle bir kez taramak iyi olur.</li>
+                    <li>Sik kullandigin bir veri seti varsa bir kez kaydedip sonra <strong>Forma yukle</strong> ile devam etmek en hizli yoldur.</li>
+                </ul>
+            </article>
+        </section>
+    </section>
+{% endblock %}
