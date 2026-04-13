@@ -10,80 +10,61 @@
 {% block content %}
     <section class="help-shell">
         <article class="help-hero">
-            <span class="landing-kicker">Yardim</span>
-            <h1>Uygulama kullanim kilavuzu</h1>
-            <p>Bu ekran, sabah toplantisi icin gerekli verilerin uygulama uzerinden nasil hazirlanacagini adim adim aciklar. Icerik, teknik ayrintilar yerine uygulama akisi ve kullanim adimlarina odaklanir.</p>
+            <span class="landing-kicker">Yardim ve Kullanim</span>
+            <h1>Gosterge Paneli (Dashboard) Bilesenleri Ne Ise Yarar?</h1>
+            <p>Sonuc ekrani, toplanti akisinizi hizlandirmak uzere farkli odaklar sunan bilesenlerden olusur. Bu dokumanda her bir bilesenin ne ise yaradigini ogrenebilirsiniz.</p>
         </article>
 
         <section class="help-grid">
             <article class="help-card">
-                <h2>1. Baslangic</h2>
+                <h2>Ozet Kartlari (En Ust Sira)</h2>
                 <ul class="help-list">
-                    <li>Hazir bir Excel dosyaniz bulunuyorsa ust kisimdaki <strong>Excel dosyasini sec</strong> butonu kullanilarak veriler tabloya aktarilabilir.</li>
-                    <li>Excel dosyasi bulunmuyorsa veri girisi dogrudan manuel tablo uzerinden yapilabilir.</li>
-                    <li>Excel yukleme islemi yalnizca veri satirlarini doldurur; analiz ve kayit islemi her zaman ekrandaki tablo uzerinden yurutulur.</li>
+                    <li><strong>TK (Parametre - Ozet):</strong> Sistem tarafindan analiz edilen toplam uretim / isg / kalite parametresi sayisidir. (ornegin 54)</li>
+                    <li><strong style="color:var(--danger)">AK (Kritik - Oncelik):</strong> Toplantida *kesinlikle* konusulmasi gereken, hedefin altinda kalinmis uretimler veya varsa isg kazasi gibi kirmizi alarm durumlarinin sayisidir.</li>
+                    <li><strong style="color:var(--success)">OK (Olumlu - Durum):</strong> Hedefi tamsayi ya da fazla ile tutturulan, sifir kaza gibi oldukca iyi giden parametre sayisidir. Moral verici bir ozettir.</li>
+                    <li><strong style="color:var(--warning)">GR (Grafik - Trend):</strong> Sistem de arka planda cizilen toplam parametre trend grafigi sayisidir.</li>
                 </ul>
             </article>
 
             <article class="help-card">
-                <h2>2. Excel ile calisma</h2>
+                <h2>Bugun (Hizli Gundem Kutusu)</h2>
                 <ul class="help-list">
-                    <li>Dosya secildiginde sistem, ilgili verileri otomatik olarak alttaki tabloya aktarir.</li>
-                    <li>Tarih kolonlari ust kisimda, satir bazli veriler ise <strong>Veri satirlari</strong> bolumunde goruntulenir.</li>
-                    <li>Aktarim tamamlandiktan sonra gerekli gorulmesi halinde hucre bazinda duzenleme yapilabilir ve ihtiyac olmayan tarihler silinebilir.</li>
-                    <li>Excel dosyasi yalnizca aktarim amaciyla kullanilir; uygulamanin sabit satir yapisi veri tabanindan okunur.</li>
+                    <li>Sol menudeki <strong>Bugun</strong> kutusu, detaylara girmeden gozatarak toplanti gundemini belirleyen *Hizli Eylem* listesidir.</li>
+                    <li>Sistem, sadece kirmizi alarm olan (Kritik) veya cok iyi olan (Olumlu) maddeleri analiz ederek bu kutuda kisa sekilde siralayarak sizi dogrudan onemli konulara odaklar.</li>
+                    <li>Aksiyon alinmasi gereken bir detay yoksa bos kalmamasi adina bazi genel metrikleri siralayabilir.</li>
                 </ul>
             </article>
 
             <article class="help-card">
-                <h2>3. Manuel veri girisi</h2>
+                <h2>1. Inceleme Sekmesi</h2>
                 <ul class="help-list">
-                    <li>Ilk olarak <strong>Baslangic</strong> ve <strong>Bitis</strong> tarihleri belirlenmeli, ardindan <strong>Araligi olustur</strong> butonu kullanilmalidir.</li>
-                    <li>Ilave bir gun eklenmesi gerekiyorsa <strong>Sonraki gunu ekle</strong> secenegi kullanilabilir.</li>
-                    <li>Kategori ve parametre satirlari sabit olarak sunulur; kullanicidan beklenen islem ilgili hucrelere deger girilmesidir.</li>
-                    <li>Yuzde tipindeki alanlarda `4` degeri girildiginde sistem bunu `%4` olarak yorumlar.</li>
-                    <li>Tablo aylik veri girisine uygun olarak tasarlanmistir; tum kolonlara erisim icin tablo alani saga, sola, asagi ve yukari kaydirilabilir.</li>
+                    <li>Ekrandaki ilk sekmedir. Tum verilerin (ortalama, maksimum, minimum, guncel deger) en saf ve teknik halidir.</li>
+                    <li>Bir muhendisin veya planlamacinin detaylara inmek istediginde, saf rakamlari hizlica taramak icin kullandigi ana paneldir.</li>
                 </ul>
             </article>
 
             <article class="help-card">
-                <h2>4. Kayitli verileri yeniden kullanma</h2>
+                <h2>2. Cikarimlar / Aksiyonlar Sekmesi</h2>
                 <ul class="help-list">
-                    <li>Ana ekrandaki <strong>Kayitli tablolar</strong> bolumunde daha once kaydedilmis tablolar listelenir.</li>
-                    <li><strong>Forma yukle</strong> butonu kullanildiginda secilen kayit tabloya tekrar aktarilir.</li>
-                    <li>Yuklenen kayit mevcut haliyle yeniden kullanilabilir veya gerekli gorulmesi halinde guncellenerek tekrar kaydedilebilir.</li>
-                    <li>Ihtiyac duyulmayan eski kayitlar ayni bolumde yer alan <strong>Sil</strong> butonu ile veri tabanindan kaldirilabilir.</li>
-                    <li>Bu ozellik, ozellikle benzer yapidaki aylik veri girislerinde sureci hizlandirmak icin faydalidir.</li>
+                    <li>Toplanti esnasinda Inceleme panelinden cok <strong>Cikarimlar</strong> sekmesi onceliklidir.</li>
+                    <li>Burada yalnizca sistemin yapay zeka ve kural motoru tarafindan filtreleyip "Kritik", "Uyari" veya "Olumlu" olarak etiketledigi yonetici raporlari yer alir.</li>
+                    <li>Zaman kazancinizi saglayan ana bilesen burasidir.</li>
                 </ul>
             </article>
 
             <article class="help-card">
-                <h2>5. Son adim: analiz ve kayit</h2>
+                <h2>3. Grafikler Sekmesi</h2>
                 <ul class="help-list">
-                    <li>Veriler kontrol edildikten sonra <strong>Analiz et ve kaydet</strong> butonu ile islem baslatilmalidir.</li>
-                    <li>Sonuc ekraninda genel ozet, dikkat gerektiren noktalar ve grafikler goruntulenir.</li>
-                    <li>Kayit islemi basariyla tamamlandiginda ekranda onay mesaji yer alir.</li>
-                    <li>Ayni veriye daha sonra yeniden erismek istenirse ana ekrandaki kayitli tablolardan devam edilebilir.</li>
+                    <li>Rakam yerine trend (gidisat) gormek isteyenler icin her parametrenin analiz grafikleri bu galeridedir.</li>
+                    <li>Filtre barini kullanarak, ornegin yalnizca *"Isg"* kategorisini secip, sag/sol oklarla gunluk artis-azalis trendlerini inceleyerek gorsel karar alabilirsiniz.</li>
                 </ul>
             </article>
 
             <article class="help-card">
-                <h2>6. Sonuc ekraninin okunmasi</h2>
+                <h2>4. AI Degerlendirme Sekmesi</h2>
                 <ul class="help-list">
-                    <li><strong>Genel ozet</strong> kartlari, kritik ve olumlu durumlarin genel dagilimini hizli sekilde gosterir.</li>
-                    <li><strong>Cikarimlar</strong> bolumu, toplantida oncelikli olarak ele alinmasi gereken konulari one cikarir.</li>
-                    <li><strong>Grafikler</strong> sayesinde parametrelerin gun bazindaki degisimi izlenebilir.</li>
-                    <li>Bu ekran, toplanti sirasinda kullanilabilecek kisa ve duzenli bir ozet yapisi sunar.</li>
-                </ul>
-            </article>
-
-            <article class="help-card">
-                <h2>7. Kullanim onerileri ve dikkat noktalari</h2>
-                <ul class="help-list">
-                    <li>Ayni satirin tekrar acilmasi yerine mevcut satirin guncellenmesi daha duzenli bir kullanim saglar.</li>
-                    <li>Analiz asamasina gecmeden once tarihlerin dogru sirada ve eksiksiz oldugu kontrol edilmelidir.</li>
-                    <li>Excel uzerinden veri aktarimi yapildiysa, aktarim sonrasinda tablonun genel olarak gozden gecirilmesi tavsiye edilir.</li>
-                    <li>Sik kullanilan bir tablo bulunuyorsa bir kez kaydedilip daha sonra <strong>Forma yukle</strong> secenegi ile yeniden kullanilmasi sureci hizlandirir.</li>
+                    <li>Tum gosterge panelindeki ham veriler birlesip bir metne donusturuldurkten sonra Yapay Zekaya sunulur.</li>
+                    <li>Bu sekme, tamamen insancil ve bir "genel mudur ozeti" ustlubuyla size o gunun toplantisi icin 1-2 paragraflik yazili bir oykulesmis rapor cikarir. Ciktisi hazir bulunmaktadir.</li>
                 </ul>
             </article>
         </section>

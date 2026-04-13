@@ -151,8 +151,9 @@ a {
 }
 
 .hero-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: 12px;
     margin-bottom: 14px;
     padding: 20px 22px;
@@ -327,6 +328,31 @@ a {
 
 .metric-card--span-12 {
     grid-column: span 12;
+}
+
+.metric-card--danger {
+    background: rgba(234, 79, 91, 0.08);
+    border-color: rgba(234, 79, 91, 0.25);
+}
+
+.metric-card--success {
+    background: rgba(23, 162, 106, 0.08);
+    border-color: rgba(23, 162, 106, 0.25);
+}
+
+.metric-card--warning {
+    background: rgba(240, 180, 41, 0.08);
+    border-color: rgba(240, 180, 41, 0.25);
+}
+
+.metric-card--interactive {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card--interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(35, 57, 95, 0.15);
 }
 
 .metric-icon {

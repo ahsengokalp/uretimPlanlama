@@ -14,11 +14,6 @@
             <div class="hero-title-row">
                 <h1 class="hero-title">Sabah Toplanti Raporu</h1>
                 <div class="hero-pills hero-pills--inline">
-                    {% if source_name %}
-                        <span class="hero-pill">{{ source_kind }}: {{ source_name }}</span>
-                    {% endif %}
-                    <span class="hero-pill">ISG / Kalite / Uretim: {{ operational_day }}</span>
-                    <span class="hero-pill">Planlama: {{ planlama_day }}</span>
                     <span class="hero-pill">{% if ai_comment %}AI ozet hazir{% else %}AI ozet yok{% endif %}</span>
                 </div>
             </div>
@@ -27,7 +22,7 @@
     </section>
 
     <section class="metric-grid">
-        <article class="metric-card metric-card--span-3">
+        <article class="metric-card metric-card--span-3 metric-card--interactive" onclick="activateSection('review'); document.querySelector('.workspace-grid').scrollIntoView({behavior: 'smooth'});">
             <div class="metric-icon metric-icon--info">TK</div>
             <div class="metric-copy">
                 <span class="metric-label">Parametre</span>
@@ -35,7 +30,7 @@
                 <span class="metric-help">Ozet</span>
             </div>
         </article>
-        <article class="metric-card metric-card--span-3">
+        <article class="metric-card metric-card--span-3 metric-card--danger metric-card--interactive" onclick="activateSection('actions'); document.getElementById('actions-status').value = 'danger'; applyFilters('actions'); document.querySelector('.workspace-grid').scrollIntoView({behavior: 'smooth'});">
             <div class="metric-icon metric-icon--danger">AK</div>
             <div class="metric-copy">
                 <span class="metric-label">Kritik</span>
@@ -43,7 +38,7 @@
                 <span class="metric-help">Oncelik</span>
             </div>
         </article>
-        <article class="metric-card metric-card--span-3">
+        <article class="metric-card metric-card--span-3 metric-card--interactive metric-card--success" onclick="activateSection('actions'); document.getElementById('actions-status').value = 'success'; applyFilters('actions'); document.querySelector('.workspace-grid').scrollIntoView({behavior: 'smooth'});">
             <div class="metric-icon metric-icon--success">OK</div>
             <div class="metric-copy">
                 <span class="metric-label">Olumlu</span>
@@ -51,7 +46,7 @@
                 <span class="metric-help">Durum</span>
             </div>
         </article>
-        <article class="metric-card metric-card--span-3">
+        <article class="metric-card metric-card--span-3 metric-card--interactive metric-card--warning" onclick="activateSection('charts'); document.querySelector('.workspace-grid').scrollIntoView({behavior: 'smooth'});">
             <div class="metric-icon metric-icon--warning">GR</div>
             <div class="metric-copy">
                 <span class="metric-label">Grafik</span>

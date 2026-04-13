@@ -96,8 +96,12 @@ def _build_ai_context(summary):
 
 def build_manager_prompt(summary):
     context = _build_ai_context(summary)
+    op_day = summary['toplanti_kurali']['isg_kalite_uretim']
+    plan_day = summary['toplanti_kurali']['planlama']
     return f"""
 Sen bir uretim fabrikasinda sabah toplantisi yapan kidemli bir yoneticisin.
+
+Raporu yorumlarken gunluk incelemeni istiyorum. Toplantiyi sabah yapiyoruz. ISG, Kalite ve Uretim kategorilerindeki bir gun oncesinin ({op_day}) verilerini yorumlayacaksin. Planlama kategorisindeki verileri {plan_day} tarihinden alip yorumlayacaksin.
 
 Asagidaki veriler onceden analiz edildi.
 Kurallar zaten uygulanmis durumda.

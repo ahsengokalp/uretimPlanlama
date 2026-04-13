@@ -9,16 +9,16 @@ from openpyxl import load_workbook
 
 PLANLAMA_RULES = [
     ("fatura bekleyen hazir ton", 2, "Girisler neden aksiyor? Ne yapacagiz?"),
-    ("kalite kontrol bekleyen ton", 1, "Kalite kontrolde bekleyen isler icin karar hizlanmali."),
-    ("rework bekleyen ton", 1, "Rework akisini hizlandiracak net bir aksiyon belirlenmeli."),
-    ("taslama stogu ton", 20, "Taslama stogu kritik seviyede. Yuku dagitacak plan gerekli."),
-    ("kumlama stogu ton", 20, "Kumlama stogu kritik seviyede. Birikme noktasi incelenmeli."),
-    ("dokulecek is miktari ton", 50, "Dokum yuku yuksek. Hat ve mesai plani gozden gecirilmeli."),
-    ("mevcut siparis ton", 20, "Mevcut siparis yuku kritik seviyeyi asti."),
-    ("2 hafta sonrasi icin dokum eksigi ton", 30, "Iki hafta sonrasi icin dokum eksigi kritik seviyede."),
-    ("1 hafta sonrasi icin dokum eksigi ton", 10, "Bir hafta sonrasi icin dokum eksigi kritik seviyede."),
-    ("mevcut hafta icin dokum eksigi ton", 5, "Mevcut hafta icin dokum eksigi kritik seviyede."),
-    ("bakiye icin dokum eksigi ton", 2, "Bakiye dokum eksigi icin kok neden kontrol edilmeli."),
+    ("kalite kontrol bekleyen ton", 1, "Kalite Kontrol'de urun beklememeli. Karar veremedigimiz bir nokta mi var?"),
+    ("rework bekleyen ton", 1, "Rework'ler neden yurumuyor?"),
+    ("taslama stogu ton", 20, "Isler yigildi. 20 tonun altina inmek icin ne yapacagiz?"),
+    ("kumlama stogu ton", 20, "Isler yigildi. 20 tonun altina inmek icin ne yapacagiz? Sarsakta mi yoksa kumlamada mi birikti?"),
+    ("dokulecek is miktari ton", 50, "Dokumde yapilacak cok is var. Hangi hatta dokum mesaisi yapacagiz?"),
+    ("mevcut siparis", 20, "Kritik siniri astik. Durum bazinda inceleme yapilmali"),
+    ("2 hafta sonrasi icin dokum eksigi", 30, "Kritik siniri astik. Hat ve alasim bazinda inceleme yapilmali"),
+    ("1 hafta sonrasi icin dokum eksigi", 10, "Kritik siniri astik. Hat ve alasim bazinda inceleme yapilmali"),
+    ("mevcut hafta icin dokum eksigi", 5, "Kritik siniri astik. Hat, alasim ve urun bazinda inceleme yapilmali"),
+    ("bakiye icin dokum eksigi", 2, "Bu bakiye hurdadan mi geliyor yoksa planlamamizda mi bir hata var?"),
 ]
 
 CATEGORY_ORDER = {
@@ -408,7 +408,7 @@ def generate_isg_action(row):
         return build_action_payload(
             row,
             row["Tarih"].normalize(),
-            "Kaza nedeni netlestirilmeli ve aksiyon plani acilmali.",
+            "Kaza nedeni nedir? Aksiyon planla",
             comparison_value=0,
             status="danger",
             status_label="Kritik",
@@ -417,11 +417,11 @@ def generate_isg_action(row):
     return build_action_payload(
         row,
         row["Tarih"].normalize(),
-        "Boyle devam!",
+        "Böyle devam!",
         comparison_value=0,
         status="success",
-        status_label="Iyi",
-        relation_label="Sifir kaza",
+        status_label="İyi",
+        relation_label="Sıfır kaza",
     )
 
 
@@ -438,20 +438,20 @@ def generate_kalite_uretim_action(row):
         return build_action_payload(
             row,
             row["Tarih"].normalize(),
-            "Kalite hedefi asildi. Hangi hat veya urunde sapma oldugu incelenmeli.",
+            "Hatayı analiz et. Hangi hatta hangi üründe problem var? Aksiyon listesine yaz",
             status="danger",
             status_label="Kritik",
-            relation_label="Hedefin ustunde",
+            relation_label="Hedefin üstünde",
         )
 
     if kategori == "kalite":
-        relation_label = "Hedefe esit" if deger == hedef else "Hedefin altinda"
+        relation_label = "Hedefe eşit" if deger == hedef else "Hedefin altında"
         return build_action_payload(
             row,
             row["Tarih"].normalize(),
-            "Tebrikler. Hedefleneni gerceklestirdin.",
+            "Tebrikler. Hedefleneni gerçekleştirdin.",
             status="success",
-            status_label="Iyi",
+            status_label="İyi",
             relation_label=relation_label,
         )
 
@@ -459,20 +459,20 @@ def generate_kalite_uretim_action(row):
         return build_action_payload(
             row,
             row["Tarih"].normalize(),
-            "Uretim hedefin altinda kaldi. Kapasite ve durus nedenleri kontrol edilmeli.",
+            "Hedefi neden tutturamadık? Arıza mı vardı? Personel eksiğin mi var? Yoksa verimsiz mi çalışıyoruz? Aksiyonumuz nedir?",
             status="danger",
             status_label="Kritik",
-            relation_label="Hedefin altinda",
+            relation_label="Hedefin altında",
         )
 
     if kategori == "uretim":
-        relation_label = "Hedefe esit" if deger == hedef else "Hedefin ustunde"
+        relation_label = "Hedefe eşit" if deger == hedef else "Hedefin üstünde"
         return build_action_payload(
             row,
             row["Tarih"].normalize(),
-            "Tebrikler. Bunu nasil surdurebiliriz?",
+            "Tebrikler. Bunu nasıl sürdürebiliriz?",
             status="success",
-            status_label="Iyi",
+            status_label="İyi",
             relation_label=relation_label,
         )
 
