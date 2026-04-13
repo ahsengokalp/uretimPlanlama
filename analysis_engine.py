@@ -129,6 +129,8 @@ def format_excel_cell_value(value, number_format, parametre=None):
     if any(token in format_text for token in ("0", "#")):
         numeric_value = quantize_decimal(float(value), decimals)
         display_value = f"{numeric_value:.{decimals}f}" if decimals > 0 else str(int(numeric_value))
+        if unit == "%":
+            return f"{display_value}%"
         if unit == "T":
             return f"{display_value}T"
         if unit == "kg":
@@ -136,6 +138,10 @@ def format_excel_cell_value(value, number_format, parametre=None):
         if unit == "adet":
             return f"{display_value} adet"
         return display_value
+
+    numeric_value = pd.to_numeric(value, errors="coerce")
+    if not pd.isna(numeric_value) and unit == "%":
+        return f"{to_display_number(float(numeric_value), decimals=1)}%"
 
     return str(value)
 
@@ -641,11 +647,10 @@ def create_charts(df):
     return charts
 
 
-def analyze_excel_file(filepath):
-    excel_display_map = build_excel_display_map(filepath, sheet_name="Veriler")
-    raw_df = pd.read_excel(filepath, sheet_name="Veriler")
+def analyze_raw_dataframe(raw_df, display_map=None):
     df = prepare_dataframe(raw_df)
-    df = enrich_with_excel_display(df, excel_display_map)
+    if display_map:
+        df = enrich_with_excel_display(df, display_map)
     df = attach_targets(df)
 
     charts = create_charts(df)
@@ -679,3 +684,9 @@ def analyze_excel_file(filepath):
         "operational_day": str(operational_day.date()),
         "planlama_day": str(planlama_day.date()),
     }
+
+
+def analyze_excel_file(filepath):
+    excel_display_map = build_excel_display_map(filepath, sheet_name="Veriler")
+    raw_df = pd.read_excel(filepath, sheet_name="Veriler")
+    return analyze_raw_dataframe(raw_df, display_map=excel_display_map)
