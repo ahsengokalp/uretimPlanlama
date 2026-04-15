@@ -32,100 +32,161 @@ def _missing_db_keys(settings):
     return [key for key, value in settings.items() if not value]
 
 
+def _table_exists(connection, table_name, schema_name="public"):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = %s
+                  AND table_name = %s
+            )
+            """,
+            (schema_name, table_name),
+        )
+        return bool(cursor.fetchone()[0])
+
+
+def _column_exists(connection, table_name, column_name, schema_name="public"):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = %s
+                  AND table_name = %s
+                  AND column_name = %s
+            )
+            """,
+            (schema_name, table_name, column_name),
+        )
+        return bool(cursor.fetchone()[0])
+
+
+def _index_exists(connection, index_name, schema_name="public"):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM pg_indexes
+                WHERE schemaname = %s
+                  AND indexname = %s
+            )
+            """,
+            (schema_name, index_name),
+        )
+        return bool(cursor.fetchone()[0])
+
+
 def _ensure_tables(connection):
     global _TABLES_READY
     if _TABLES_READY:
         return
 
     with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS manual_data_template_rows (
-                id BIGSERIAL PRIMARY KEY,
-                row_order INTEGER NOT NULL,
-                kategori TEXT NOT NULL,
-                parametre TEXT NOT NULL,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        if not _table_exists(connection, "manual_data_template_rows"):
+            cursor.execute(
+                """
+                CREATE TABLE manual_data_template_rows (
+                    id BIGSERIAL PRIMARY KEY,
+                    row_order INTEGER NOT NULL,
+                    kategori TEXT NOT NULL,
+                    parametre TEXT NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                )
+                """
             )
-            """
-        )
-        cursor.execute(
-            """
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_manual_data_template_rows_order
-            ON manual_data_template_rows (row_order)
-            """
-        )
-        cursor.execute(
-            """
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_manual_data_template_rows_pair
-            ON manual_data_template_rows (kategori, parametre)
-            """
-        )
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS manual_data_submissions (
-                id UUID PRIMARY KEY,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                source_kind TEXT NOT NULL,
-                template_name TEXT,
-                submission_name TEXT,
-                submission_hash TEXT,
-                date_start DATE,
-                date_end DATE,
-                row_count INTEGER NOT NULL,
-                filled_value_count INTEGER NOT NULL,
-                payload JSONB NOT NULL,
-                operational_day DATE,
-                planlama_day DATE
+        if not _index_exists(connection, "idx_manual_data_template_rows_order"):
+            cursor.execute(
+                """
+                CREATE UNIQUE INDEX idx_manual_data_template_rows_order
+                ON manual_data_template_rows (row_order)
+                """
             )
-            """
-        )
-        cursor.execute(
-            """
-            ALTER TABLE manual_data_submissions
-            ADD COLUMN IF NOT EXISTS submission_name TEXT
-            """
-        )
-        cursor.execute(
-            """
-            ALTER TABLE manual_data_submissions
-            ADD COLUMN IF NOT EXISTS submission_hash TEXT
-            """
-        )
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_manual_data_submissions_hash
-            ON manual_data_submissions (submission_hash, created_at DESC)
-            """
-        )
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS manual_data_values (
-                id BIGSERIAL PRIMARY KEY,
-                submission_id UUID NOT NULL REFERENCES manual_data_submissions(id) ON DELETE CASCADE,
-                row_order INTEGER NOT NULL,
-                date_order INTEGER NOT NULL,
-                kategori TEXT NOT NULL,
-                parametre TEXT NOT NULL,
-                tarih DATE NOT NULL,
-                deger DOUBLE PRECISION NOT NULL,
-                unit TEXT,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        if not _index_exists(connection, "idx_manual_data_template_rows_pair"):
+            cursor.execute(
+                """
+                CREATE UNIQUE INDEX idx_manual_data_template_rows_pair
+                ON manual_data_template_rows (kategori, parametre)
+                """
             )
-            """
-        )
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_manual_data_values_submission
-            ON manual_data_values (submission_id)
-            """
-        )
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_manual_data_values_lookup
-            ON manual_data_values (kategori, parametre, tarih)
-            """
-        )
+
+        if not _table_exists(connection, "manual_data_submissions"):
+            cursor.execute(
+                """
+                CREATE TABLE manual_data_submissions (
+                    id UUID PRIMARY KEY,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    source_kind TEXT NOT NULL,
+                    template_name TEXT,
+                    submission_name TEXT,
+                    submission_hash TEXT,
+                    date_start DATE,
+                    date_end DATE,
+                    row_count INTEGER NOT NULL,
+                    filled_value_count INTEGER NOT NULL,
+                    payload JSONB NOT NULL,
+                    operational_day DATE,
+                    planlama_day DATE
+                )
+                """
+            )
+        if not _column_exists(connection, "manual_data_submissions", "submission_name"):
+            cursor.execute(
+                """
+                ALTER TABLE manual_data_submissions
+                ADD COLUMN submission_name TEXT
+                """
+            )
+        if not _column_exists(connection, "manual_data_submissions", "submission_hash"):
+            cursor.execute(
+                """
+                ALTER TABLE manual_data_submissions
+                ADD COLUMN submission_hash TEXT
+                """
+            )
+        if not _index_exists(connection, "idx_manual_data_submissions_hash"):
+            cursor.execute(
+                """
+                CREATE INDEX idx_manual_data_submissions_hash
+                ON manual_data_submissions (submission_hash, created_at DESC)
+                """
+            )
+
+        if not _table_exists(connection, "manual_data_values"):
+            cursor.execute(
+                """
+                CREATE TABLE manual_data_values (
+                    id BIGSERIAL PRIMARY KEY,
+                    submission_id UUID NOT NULL REFERENCES manual_data_submissions(id) ON DELETE CASCADE,
+                    row_order INTEGER NOT NULL,
+                    date_order INTEGER NOT NULL,
+                    kategori TEXT NOT NULL,
+                    parametre TEXT NOT NULL,
+                    tarih DATE NOT NULL,
+                    deger DOUBLE PRECISION NOT NULL,
+                    unit TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                )
+                """
+            )
+        if not _index_exists(connection, "idx_manual_data_values_submission"):
+            cursor.execute(
+                """
+                CREATE INDEX idx_manual_data_values_submission
+                ON manual_data_values (submission_id)
+                """
+            )
+        if not _index_exists(connection, "idx_manual_data_values_lookup"):
+            cursor.execute(
+                """
+                CREATE INDEX idx_manual_data_values_lookup
+                ON manual_data_values (kategori, parametre, tarih)
+                """
+            )
 
     _TABLES_READY = True
 

@@ -473,7 +473,30 @@
                 valueRows.map((row) => [`${row.category || ""}|||${row.parameter || ""}`, row.values || {}]),
             );
 
-            templateRows.forEach((templateRow) => {
+            const rowsToRender = templateRows.length
+                ? [...templateRows]
+                : valueRows.map((row) => ({
+                    category: row.category || "",
+                    parameter: row.parameter || "",
+                }));
+
+            const existingKeys = new Set(
+                rowsToRender.map((row) => `${row.category || ""}|||${row.parameter || ""}`),
+            );
+
+            valueRows.forEach((row) => {
+                const rowKey = `${row.category || ""}|||${row.parameter || ""}`;
+                if (existingKeys.has(rowKey)) {
+                    return;
+                }
+                existingKeys.add(rowKey);
+                rowsToRender.push({
+                    category: row.category || "",
+                    parameter: row.parameter || "",
+                });
+            });
+
+            rowsToRender.forEach((templateRow) => {
                 createRow({
                     category: templateRow.category,
                     parameter: templateRow.parameter,
